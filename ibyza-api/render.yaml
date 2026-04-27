@@ -1,0 +1,111 @@
+# ─── IBYZA Backend — Configuración de despliegue Render ──────────────────────
+#
+# Uso:
+#   1. Subir este archivo a la raíz del repo (ibyza-api/).
+#   2. En render.com → "New +" → "Blueprint" → conectar el repo.
+#   3. Render detecta este YAML y aprovisiona PostgreSQL + Web Service.
+#   4. Completar las variables marcadas con `sync: false` desde el dashboard.
+#
+# Costo:
+#   - Free tier (90 días): $0
+#   - Después de 90 días: $7/mes (DB) + $7/mes (Web Service) = $14/mes
+#   - Free tier de Web Service: el servicio "duerme" tras 15 min sin tráfico
+#     (primer request tarda ~30s en responder).
+#
+# Plan futuro:
+#   Cuando se migre a Railway, este archivo se reemplaza por `railway.toml`
+#   y las mismas variables se configuran en el dashboard de Railway.
+# ──────────────────────────────────────────────────────────────────────────────
+
+databases:
+  - name: ibyza-db
+    databaseName: ibyza
+    user: ibyza
+    plan: free  # 90 días gratis (1 GB), luego $7/mes
+    region: oregon
+
+services:
+  - type: web
+    name: ibyza-api
+    runtime: python
+    plan: free  # 750h/mes gratis. Para evitar "sleep" upgradear a starter ($7/mes).
+    region: oregon  # más cercano a Perú (us-west)
+    branch: main
+
+    # Si el repositorio contiene SOLO el backend (ibyza-api), eliminar `rootDir`.
+    # Si contiene varios proyectos (ibyza-api/, ibyza-web/, ...) descomentar:
+    # rootDir: ibyza-api
+
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+
+    # Solo migrate + create_admin + gunicorn.
+    # Las seeds (seed_proyectos, seed_contenido) se corren UNA VEZ desde
+    # "Render Shell" tras el primer deploy, no en cada release, para no
+    # sobrescribir cambios que Diana haya hecho desde el admin.
+    startCommand: |
+      python manage.py migrate --noinput
+      python manage.py create_admin
+      gunicorn ibyza.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+
+    healthCheckPath: /admin/login/
+
+    envVars:
+      # ─── Django core ──────────────────────────────────────────────────────
+      - key: DEBUG
+        value: "False"
+
+      - key: SECRET_KEY
+        generateValue: true  # Render genera una clave aleatoria segura
+
+      - key: ALLOWED_HOSTS
+        sync: false
+        # Tras el primer deploy, completar con: ibyza-api.onrender.com,ibyzacorp.com
+
+      # ─── Base de datos ────────────────────────────────────────────────────
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ibyza-db
+          property: connectionString
+
+      # ─── CORS (frontend) ─────────────────────────────────────────────────
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+        # Ej: https://ibyza-web.vercel.app,https://ibyzacorp.com
+
+      # ─── Email (Resend) ──────────────────────────────────────────────────
+      - key: RESEND_API_KEY
+        sync: false  # Pegar la key de https://resend.com/api-keys
+
+      - key: RESEND_FROM_EMAIL
+        value: "IBYZA <onboarding@resend.dev>"
+        # Cuando se verifique ibyzacorp.com en Resend cambiar a:
+        # IBYZA <no-reply@ibyzacorp.com>
+
+      - key: EMAIL_RECIPIENTS
+        sync: false
+        # Ej: ventas@ibyzacorp.com,stephano.cornejoc@gmail.com
+
+      # ─── Culqi (Pasarela de pago) ─────────────────────────────────────────
+      - key: CULQI_PUBLIC_KEY
+        sync: false  # pk_test_... (sandbox) o pk_live_... (producción)
+
+      - key: CULQI_SECRET_KEY
+        sync: false  # sk_test_... o sk_live_...
+
+      # ─── Superusuario inicial del admin ──────────────────────────────────
+      # Sólo se crea en el primer deploy si no existe.
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@ibyzacorp.com
+
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false  # Generar una contraseña segura (mínimo 12 caracteres)
+
+      # ─── Python version ──────────────────────────────────────────────────
+      - key: PYTHON_VERSION
+        value: 3.12.9

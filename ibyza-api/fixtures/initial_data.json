@@ -1,0 +1,67 @@
+[
+  {
+    "model": "projects.proyecto", "pk": 1,
+    "fields": {
+      "nombre": "Bolívar 205", "slug": "bolivar-205",
+      "descripcion_corta": "Departamentos modernos en el corazón de Arequipa. Ubicación estratégica y la mejor inversión.",
+      "descripcion": "Proyecto inmobiliario ubicado estratégicamente en Calle Puente Bolívar N° 205, Arequipa. Un desarrollo moderno que combina diseño contemporáneo con ubicación privilegiada, ofreciendo departamentos de alta calidad para quienes buscan su mejor inversión en una de las zonas más consolidadas de la ciudad.",
+      "ubicacion": "Calle Puente Bolívar N° 205, Arequipa",
+      "google_maps_embed": "", "imagen_fachada": "", "imagen_isometrico": "", "catalogo_pdf": "",
+      "estado": "en_venta", "precio_desde": "180000.00", "orden": 1, "activo": true
+    }
+  },
+  {
+    "model": "projects.proyecto", "pk": 2,
+    "fields": {
+      "nombre": "Parke 10 Católica", "slug": "parke-10-catolica",
+      "descripcion_corta": "Proyecto exclusivo con áreas verdes y zonas de recreación. Vive en equilibrio con la naturaleza.",
+      "descripcion": "Parke 10 Católica es un exclusivo proyecto inmobiliario que fusiona modernidad y naturaleza. Diseñado para quienes valoran la calidad de vida, cuenta con espacios verdes, zonas de recreación y departamentos con acabados de primera línea en una de las ubicaciones más cotizadas de Arequipa.",
+      "ubicacion": "Zona Católica, Arequipa",
+      "google_maps_embed": "", "imagen_fachada": "", "imagen_isometrico": "", "catalogo_pdf": "",
+      "estado": "preventa", "precio_desde": "210000.00", "orden": 2, "activo": true
+    }
+  },
+  {
+    "model": "projects.proyecto", "pk": 3,
+    "fields": {
+      "nombre": "Mira Verde", "slug": "mira-verde",
+      "descripcion_corta": "Tu hogar ideal con piscina, parrillas y áreas comunes de primer nivel.",
+      "descripcion": "Mira Verde redefine el concepto de vivienda sostenible en Arequipa. Con amplias áreas comunes, piscina, parrillas y una arquitectura que integra espacios naturales, ofrece el hogar ideal para familias que buscan calidad de vida y crecimiento patrimonial.",
+      "ubicacion": "Arequipa",
+      "google_maps_embed": "", "imagen_fachada": "", "imagen_isometrico": "", "catalogo_pdf": "",
+      "estado": "en_construccion", "precio_desde": "195000.00", "orden": 3, "activo": true
+    }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 1,
+    "fields": { "seccion": "hero", "clave": "titulo", "valor": "Tu mejor inversión al mejor precio y en la mejor ubicación", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 2,
+    "fields": { "seccion": "hero", "clave": "subtitulo", "valor": "Desarrollamos proyectos inmobiliarios en áreas consolidadas de Arequipa, generando el mayor valor para nuestros clientes.", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 3,
+    "fields": { "seccion": "nosotros", "clave": "mision", "valor": "Desarrollar proyectos inmobiliarios en áreas consolidadas, generando el mayor valor para los clientes.", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 4,
+    "fields": { "seccion": "nosotros", "clave": "vision", "valor": "Ser el referente local en el desarrollo inmobiliario sostenible.", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 5,
+    "fields": { "seccion": "contacto", "clave": "direccion", "valor": "Calle Puente Bolívar N° 205, Arequipa", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 6,
+    "fields": { "seccion": "contacto", "clave": "telefono", "valor": "953728070", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 7,
+    "fields": { "seccion": "footer", "clave": "slogan", "valor": "Tu mejor inversión al mejor precio y en la mejor ubicación", "imagen": "", "activo": true }
+  },
+  {
+    "model": "content.contenidoweb", "pk": 8,
+    "fields": { "seccion": "footer", "clave": "whatsapp", "valor": "51953728070", "imagen": "", "activo": true }
+  }
+]

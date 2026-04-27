@@ -1,0 +1,34 @@
+{
+  "name": "ibyza-e2e",
+  "version": "1.0.0",
+  "description": "IBYZA — Suite E2E con Serenity/JS Screenplay Pattern + Cucumber + Playwright",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cucumber-js features --import src/step-definitions/hooks.js --import src/step-definitions/navegacion.steps.js --import src/step-definitions/inicio.steps.js --import src/step-definitions/proyectos.steps.js --import src/step-definitions/contacto.steps.js --import src/step-definitions/separacion.steps.js --import src/step-definitions/admin.steps.js --format progress --format summary",
+    "test:headed": "cross-env HEADLESS=false npm test",
+    "test:smoke": "npm test -- --tags @smoke",
+    "test:critical": "npm test -- --tags @critical",
+    "test:navegacion": "npm test -- features/navegacion.feature",
+    "test:inicio": "npm test -- features/inicio.feature",
+    "test:proyectos": "npm test -- features/proyectos.feature",
+    "test:contacto": "npm test -- features/contacto.feature",
+    "test:admin": "npm test -- features/admin.feature",
+    "clean": "rimraf reports target",
+    "install:browsers": "playwright install chromium"
+  },
+  "dependencies": {
+    "@cucumber/cucumber": "^11.0.0",
+    "@serenity-js/assertions": "^3.30.0",
+    "@serenity-js/console-reporter": "^3.30.0",
+    "@serenity-js/core": "^3.30.0",
+    "@serenity-js/cucumber": "^3.30.0",
+    "@serenity-js/playwright": "^3.30.0",
+    "@serenity-js/rest": "^3.30.0",
+    "@serenity-js/serenity-bdd": "^3.30.0",
+    "@serenity-js/web": "^3.30.0",
+    "axios": "^1.7.0",
+    "playwright": "^1.48.0",
+    "rimraf": "^6.0.1"
+  }
+}

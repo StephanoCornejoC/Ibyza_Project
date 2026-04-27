@@ -1,0 +1,133 @@
+# ─── Variables de entorno (NUNCA subir credenciales) ────────────────────────
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+*.env
+!.env.example
+
+# ─── Backend (Django / Python) ───────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+build/
+dist/
+*.egg
+
+# Django específico
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+db.sqlite3-journal
+ibyza-api/db.sqlite3
+ibyza-api/staticfiles/
+ibyza-api/media/
+ibyza-api/local_settings.py
+
+# Coverage / pytest
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ─── Frontend (Node / React / Vite) ──────────────────────────────────────────
+node_modules/
+**/node_modules/
+.pnp/
+.pnp.js
+.yarn/install-state.gz
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.vite/
+*.tsbuildinfo
+
+# ─── Tests E2E (Serenity / Cucumber / Playwright) ────────────────────────────
+ibyza-e2e/target/
+ibyza-e2e/test-output/
+ibyza-e2e/test-results/
+ibyza-e2e/playwright-report/
+ibyza-e2e/screenshots/
+ibyza-e2e/videos/
+ibyza-e2e/serenity-results/
+ibyza-e2e/*.log
+ibyza-e2e/test-*.log
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ─── Editor / IDE ────────────────────────────────────────────────────────────
+.vscode/
+!.vscode/settings.json.example
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+# ─── Sistema operativo ───────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# ─── Backups locales (no subir el history previo) ────────────────────────────
+.git_backup_local/
+**/.git_backup_local/
+
+# ─── Otros ───────────────────────────────────────────────────────────────────
+*.pid
+*.seed
+*.pid.lock
+.npm
+.eslintcache
+.stylelintcache
+*.tgz
+*.tar.gz
+
+# Archivos temporales del usuario
+*~
+*.tmp
+*.bak
+*.orig
+
+# Cosas que no queremos subir aunque las uses local
+ibyza-api/package.json
+ibyza-api/package-lock.json
+ibyza-api/node_modules/

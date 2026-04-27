@@ -1,0 +1,31 @@
+# Core
+Django>=6.0.3
+djangorestframework==3.15.2
+django-cors-headers==4.4.0
+
+# Imágenes
+Pillow>=11.0.0
+
+# Variables de entorno
+python-dotenv==1.0.1
+
+# Base de datos (SQLite en dev → PostgreSQL en prod con una sola línea)
+dj-database-url==2.3.0
+psycopg2-binary>=2.9.9
+
+# Servidor producción
+gunicorn==22.0.0
+whitenoise==6.7.0
+
+# Filtros en API
+django-filter==24.3
+
+# Admin moderno e intuitivo para clientes
+django-unfold==0.42.0
+
+# Pasarela de pago Culqi (Perú)
+culqipy==0.2.4
+requests>=2.31.0
+
+# Email transaccional (3000/mes gratis, alta deliverability)
+resend>=2.0.0
