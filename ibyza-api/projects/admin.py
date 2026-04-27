@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from unfold.admin import ModelAdmin, TabularInline
 from .models import Proyecto, Nivel, Departamento, AvanceDeObra, VideoProyecto, ImagenGaleria
 
@@ -87,8 +88,8 @@ class ProyectoAdmin(ModelAdmin):
                 '<img src="{}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;" />',
                 obj.imagen_fachada.url,
             )
-        return format_html(
-            '<div style="width:60px;height:45px;background:#e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px;">Sin foto</div>',
+        return mark_safe(
+            '<div style="width:60px;height:45px;background:#e5e7eb;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px;">Sin foto</div>'
         )
 
     @admin.display(description='Estado', ordering='estado')
@@ -109,7 +110,7 @@ class ProyectoAdmin(ModelAdmin):
     def precio_formato(self, obj):
         if obj.precio_desde:
             return format_html('<strong>S/ {}</strong>', f'{obj.precio_desde:,.0f}')
-        return format_html('<span style="color:#9ca3af">—</span>')
+        return mark_safe('<span style="color:#9ca3af">—</span>')
 
     @admin.display(description='Deptos')
     def departamentos_count(self, obj):
@@ -119,7 +120,7 @@ class ProyectoAdmin(ModelAdmin):
             for n in obj.niveles.all()
         )
         if total == 0:
-            return format_html('<span style="color:#9ca3af">—</span>')
+            return mark_safe('<span style="color:#9ca3af">—</span>')
         return format_html(
             '<span title="{} disponibles de {} en total">{} / {}</span>',
             disponibles, total, disponibles, total,
@@ -198,7 +199,7 @@ class AvanceDeObraAdmin(ModelAdmin):
                 '<img src="{}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;" />',
                 obj.imagen.url,
             )
-        return format_html('<span style="color:#9ca3af">—</span>')
+        return mark_safe('<span style="color:#9ca3af">—</span>')
 
 
 # ─── Video y Galería (registrados para autocomplete y admin) ────────────────
@@ -228,4 +229,4 @@ class ImagenGaleriaAdmin(ModelAdmin):
                 '<img src="{}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;" />',
                 obj.imagen.url,
             )
-        return format_html('<span style="color:#9ca3af">—</span>')
+        return mark_safe('<span style="color:#9ca3af">—</span>')

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from unfold.admin import ModelAdmin
 from .models import ContenidoWeb, ConfiguracionSitio, PreguntaFrecuente, Testimonio, Beneficio
 
@@ -26,7 +27,7 @@ class ContenidoWebAdmin(ModelAdmin):
     @admin.display(description='Texto')
     def preview_texto(self, obj):
         if not obj.valor:
-            return format_html('<span style="color:#9ca3af">— sin texto —</span>')
+            return mark_safe('<span style="color:#9ca3af">— sin texto —</span>')
         preview = obj.valor[:80] + '…' if len(obj.valor) > 80 else obj.valor
         return format_html('<span title="{}">{}</span>', obj.valor, preview)
 
@@ -37,8 +38,8 @@ class ContenidoWebAdmin(ModelAdmin):
                 '<img src="{}" style="width:50px;height:38px;object-fit:cover;border-radius:6px;" />',
                 obj.imagen.url,
             )
-        return format_html(
-            '<div style="width:50px;height:38px;background:#f3f4f6;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:18px;">📝</div>',
+        return mark_safe(
+            '<div style="width:50px;height:38px;background:#f3f4f6;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:18px;">📝</div>'
         )
 
 

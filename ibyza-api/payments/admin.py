@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from unfold.admin import ModelAdmin
 from .models import Separacion
 
@@ -95,13 +96,13 @@ class SeparacionAdmin(ModelAdmin):
     @admin.display(description='Comprobante')
     def tiene_comprobante(self, obj):
         if obj.metodo_pago != 'transferencia':
-            return format_html('<span style="color:#9ca3af">N/A</span>')
+            return mark_safe('<span style="color:#9ca3af">N/A</span>')
         if obj.comprobante:
             return format_html(
                 '<a href="{}" target="_blank" style="color:#22c55e;font-weight:600">📎 Ver</a>',
                 obj.comprobante.url,
             )
-        return format_html('<span style="color:#ef4444">⚠ Falta</span>')
+        return mark_safe('<span style="color:#ef4444">⚠ Falta</span>')
 
     @admin.display(description='Vista previa del comprobante')
     def comprobante_preview(self, obj):
@@ -113,7 +114,7 @@ class SeparacionAdmin(ModelAdmin):
                 '<p style="margin-top:8px;color:#6b7280;font-size:12px">Click en la imagen para abrirla en grande.</p>',
                 obj.comprobante.url, obj.comprobante.url,
             )
-        return format_html('<span style="color:#9ca3af">Sin comprobante</span>')
+        return mark_safe('<span style="color:#9ca3af">Sin comprobante</span>')
 
     @admin.action(description='✓ Aprobar transferencia (marca depto como SEPARADO)')
     def aprobar_transferencia(self, request, queryset):
