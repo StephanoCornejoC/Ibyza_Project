@@ -32,9 +32,8 @@ services:
     region: oregon  # más cercano a Perú (us-west)
     branch: main
 
-    # Si el repositorio contiene SOLO el backend (ibyza-api), eliminar `rootDir`.
-    # Si contiene varios proyectos (ibyza-api/, ibyza-web/, ...) descomentar:
-    # rootDir: ibyza-api
+    # Monorepo: el backend está en ibyza-api/ del repo Ibyza_Project
+    rootDir: ibyza-api
 
     buildCommand: |
       pip install --upgrade pip
