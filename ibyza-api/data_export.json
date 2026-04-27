@@ -1,0 +1,1300 @@
+[
+{
+  "model": "projects.proyecto",
+  "pk": 4,
+  "fields": {
+    "nombre": "Mira Verde",
+    "slug": "mira-verde",
+    "descripcion_corta": "10 departamentos exclusivos en Cayma con acabados premium y dúplex con piscina privada.",
+    "descripcion": "MIRA VERDE es un proyecto residencial ubicado en la Urb. Santa Elisa, Los Ángeles de Cayma. Cuenta con 10 departamentos de 1, 2, 3 y 4 habitaciones, con metrajes desde 46 m² hasta 240 m². Incluye 2 dúplex con piscina privada y sótano para bicicletas. Una propuesta exclusiva para quienes buscan calidad de vida en una zona consolidada de Arequipa.",
+    "ubicacion": "Urb. Santa Elisa, Los Ángeles de Cayma, Cayma, Arequipa",
+    "google_maps_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.0!2d-71.55!3d-16.38!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDIyJzQ4LjAiUyA3McKwMzMnMDAuMCJX!5e0!3m2!1ses!2spe!4v1",
+    "imagen_fachada": "proyectos/mira-verde-fachada_XblTI1Z.png",
+    "imagen_isometrico": "",
+    "catalogo_pdf": "catalogos/mira-verde-brochure_qbkqk5w.pdf",
+    "estado": "vendido",
+    "precio_desde": "54000.00",
+    "orden": 1,
+    "activo": true,
+    "empresa_receptora": "IB Y ZA INGENIERIA Y CONSTRUCCIÓN S.A.C",
+    "empresa_ruc": "20606454776",
+    "empresa_banco": "BCP - Banco de Crédito del Perú",
+    "cuenta_soles": "215-4217314-0-47",
+    "cci_soles": "002-21500421731404728",
+    "cuenta_dolares": "215-9294966-1-69",
+    "cci_dolares": "002-21500929496616925"
+  }
+},
+{
+  "model": "projects.proyecto",
+  "pk": 5,
+  "fields": {
+    "nombre": "Bolívar 205",
+    "slug": "bolivar-205",
+    "descripcion_corta": "40 departamentos con vistas al Misti, terraza con piscina y dúplex exclusivos.",
+    "descripcion": "BOLÍVAR 205 es un proyecto residencial de 40 departamentos ubicado en Puente Bolívar 205, Umacollo. Con metrajes desde 28 m² hasta 154 m², ofrece 6 dúplex (3 con piscina privada), terraza con piscina comunitaria, área de ejercicio y vistas privilegiadas al volcán Misti. Proyecto totalmente entregado.",
+    "ubicacion": "Puente Bolívar 205, Umacollo, Arequipa",
+    "google_maps_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.5!2d-71.53!3d-16.39!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDIzJzI0LjAiUyA3McKwMzEnNDguMCJX!5e0!3m2!1ses!2spe!4v1",
+    "imagen_fachada": "proyectos/bolivar-205-fachada_oD7sf2Q.png",
+    "imagen_isometrico": "",
+    "catalogo_pdf": "catalogos/bolivar-205-brochure_QUKa8BP.pdf",
+    "estado": "vendido",
+    "precio_desde": "45000.00",
+    "orden": 2,
+    "activo": true,
+    "empresa_receptora": "IB Y ZA INGENIERIA Y CONSTRUCCIÓN S.A.C",
+    "empresa_ruc": "20606454776",
+    "empresa_banco": "BCP - Banco de Crédito del Perú",
+    "cuenta_soles": "215-4217314-0-47",
+    "cci_soles": "002-21500421731404728",
+    "cuenta_dolares": "215-9294966-1-69",
+    "cci_dolares": "002-21500929496616925"
+  }
+},
+{
+  "model": "projects.proyecto",
+  "pk": 6,
+  "fields": {
+    "nombre": "Parke 10",
+    "slug": "parke-10",
+    "descripcion_corta": "~50 departamentos frente al Parque Biella con piscina y zona de parrillas.",
+    "descripcion": "PARKE 10 se ubica en la Urb. Magisterial I, Mz J Lt10, Umacollo, frente al Parque Biella. Ofrece aproximadamente 50 departamentos de 1 y 2 habitaciones, con metrajes de 29 a 70 m². Cuenta con piscina, zona de parrillas y una ubicación privilegiada frente al parque. Proyecto en construcción con departamentos disponibles.",
+    "ubicacion": "Urb. Magisterial I, Mz J Lt10 - Umacollo, Arequipa",
+    "google_maps_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.5!2d-71.53!3d-16.39!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDIzJzI0LjAiUyA3McKwMzEnNDguMCJX!5e0!3m2!1ses!2spe!4v1",
+    "imagen_fachada": "proyectos/parke-10-fachada_o8nUBqo.png",
+    "imagen_isometrico": "",
+    "catalogo_pdf": "catalogos/parke-10-brochure_MeLgNcP.pdf",
+    "estado": "vendido",
+    "precio_desde": "48900.00",
+    "orden": 3,
+    "activo": true,
+    "empresa_receptora": "IB Y ZA INGENIERIA Y CONSTRUCCIÓN S.A.C",
+    "empresa_ruc": "20606454776",
+    "empresa_banco": "BCP - Banco de Crédito del Perú",
+    "cuenta_soles": "215-4217314-0-47",
+    "cci_soles": "002-21500421731404728",
+    "cuenta_dolares": "215-9294966-1-69",
+    "cci_dolares": "002-21500929496616925"
+  }
+},
+{
+  "model": "projects.proyecto",
+  "pk": 7,
+  "fields": {
+    "nombre": "Católica",
+    "slug": "catolica",
+    "descripcion_corta": "51 unidades con piscina infinita, coworking y tiendas comerciales. 3 departamentos disponibles desde $98,900 USD.",
+    "descripcion": "CATÓLICA es un proyecto de uso mixto ubicado en Antero Peralta 46, Arequipa. Ofrece 51 unidades incluyendo departamentos de 28 a 80 m², 3 tiendas comerciales y una oficina. Incluye piscina infinita, espacio de coworking y 2 sótanos de estacionamiento. Quedan 3 departamentos disponibles en pisos 9, 10 y 11 de 69.67 m² a $98,900 USD cada uno.",
+    "ubicacion": "Antero Peralta 46, Arequipa",
+    "google_maps_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.5!2d-71.53!3d-16.39!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDIzJzI0LjAiUyA3McKwMzEnNDguMCJX!5e0!3m2!1ses!2spe!4v1",
+    "imagen_fachada": "proyectos/catolica-fachada_v3hx5i1.png",
+    "imagen_isometrico": "",
+    "catalogo_pdf": "catalogos/catolica-brochure_Di4QjrW.pdf",
+    "estado": "en_venta",
+    "precio_desde": "98900.00",
+    "orden": 4,
+    "activo": true,
+    "empresa_receptora": "GRUPO INMOBILIARIO IBYZA PERU S.A.C",
+    "empresa_ruc": "",
+    "empresa_banco": "",
+    "cuenta_soles": "",
+    "cci_soles": "",
+    "cuenta_dolares": "",
+    "cci_dolares": ""
+  }
+},
+{
+  "model": "projects.proyecto",
+  "pk": 8,
+  "fields": {
+    "nombre": "Boreal",
+    "slug": "boreal",
+    "descripcion_corta": "34 departamentos frente a parque con ascensor vehicular y 2 sótanos. Proyecto entregado.",
+    "descripcion": "BOREAL se ubica en Gonzalo Vigil 105, Umacollo, frente a un parque. Ofrece 34 departamentos de 29 a 53 m². Cuenta con 2 sótanos de estacionamiento y ascensor vehicular. Ubicación privilegiada frente a parque en zona residencial consolidada. Proyecto completamente entregado.",
+    "ubicacion": "Gonzalo Vigil 105, Umacollo, Arequipa",
+    "google_maps_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.5!2d-71.53!3d-16.39!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDIzJzI0LjAiUyA3McKwMzEnNDguMCJX!5e0!3m2!1ses!2spe!4v1",
+    "imagen_fachada": "proyectos/boreal-fachada.png",
+    "imagen_isometrico": "",
+    "catalogo_pdf": "catalogos/boreal-brochure_oXVDvfx.pdf",
+    "estado": "vendido",
+    "precio_desde": "48900.00",
+    "orden": 5,
+    "activo": true,
+    "empresa_receptora": "DESARROLLO INMOBILIARIO IBYZA AQP",
+    "empresa_ruc": "",
+    "empresa_banco": "",
+    "cuenta_soles": "",
+    "cci_soles": "",
+    "cuenta_dolares": "",
+    "cci_dolares": ""
+  }
+},
+{
+  "model": "projects.proyecto",
+  "pk": 9,
+  "fields": {
+    "nombre": "IBYZA Tower",
+    "slug": "ibyza-tower",
+    "descripcion_corta": "Edificio de uso mixto: oficinas + departamentos con vistas al Misti.",
+    "descripcion": "IBYZA TOWER es un edificio de uso mixto ubicado en Prol. Av. Ejército 522, Cerro Colorado. Los 5 primeros niveles están destinados a oficinas, y desde el piso 6 se ubican los departamentos residenciales. Ofrece vistas al volcán Misti, piscina, zona de parrillas y 2 sótanos de estacionamiento. El proyecto emblema de IBYZA.",
+    "ubicacion": "Prol. Av. Ejército 522, Cerro Colorado, Arequipa",
+    "google_maps_embed": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.5!2d-71.53!3d-16.39!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTbCsDIzJzI0LjAiUyA3McKwMzEnNDguMCJX!5e0!3m2!1ses!2spe!4v1",
+    "imagen_fachada": "",
+    "imagen_isometrico": "",
+    "catalogo_pdf": "",
+    "estado": "preventa",
+    "precio_desde": "48900.00",
+    "orden": 6,
+    "activo": true,
+    "empresa_receptora": "IBYZA LUXURY",
+    "empresa_ruc": "",
+    "empresa_banco": "",
+    "cuenta_soles": "",
+    "cci_soles": "",
+    "cuenta_dolares": "",
+    "cci_dolares": ""
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 1,
+  "fields": {
+    "proyecto": 7,
+    "numero": 9,
+    "nombre": "Piso 9",
+    "imagen_planta": "",
+    "orden": 9
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 2,
+  "fields": {
+    "proyecto": 7,
+    "numero": 10,
+    "nombre": "Piso 10",
+    "imagen_planta": "",
+    "orden": 10
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 3,
+  "fields": {
+    "proyecto": 7,
+    "numero": 11,
+    "nombre": "Piso 11",
+    "imagen_planta": "",
+    "orden": 11
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 4,
+  "fields": {
+    "proyecto": 8,
+    "numero": 1,
+    "nombre": "Planta típica",
+    "imagen_planta": "plantas/boreal-planta-tipica.png",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 5,
+  "fields": {
+    "proyecto": 7,
+    "numero": 1,
+    "nombre": "Planta típica",
+    "imagen_planta": "plantas/catolica-planta-tipica.jpeg",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 6,
+  "fields": {
+    "proyecto": 4,
+    "numero": 1,
+    "nombre": "Planta típica",
+    "imagen_planta": "plantas/mira-verde-planta-tipica.png",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.nivel",
+  "pk": 7,
+  "fields": {
+    "proyecto": 6,
+    "numero": 1,
+    "nombre": "Planta típica",
+    "imagen_planta": "plantas/parke-10-planta-tipica.jpeg",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.departamento",
+  "pk": 1,
+  "fields": {
+    "nivel": 1,
+    "codigo": "905",
+    "tipo": "2dorm",
+    "area_total": "69.67",
+    "area_techada": "65.00",
+    "precio": "98900.00",
+    "estado": "disponible",
+    "descripcion": "2 dormitorios, vista privilegiada. Precio: $98,900 USD.",
+    "imagen_planta": ""
+  }
+},
+{
+  "model": "projects.departamento",
+  "pk": 2,
+  "fields": {
+    "nivel": 2,
+    "codigo": "1005",
+    "tipo": "2dorm",
+    "area_total": "69.67",
+    "area_techada": "65.00",
+    "precio": "98900.00",
+    "estado": "disponible",
+    "descripcion": "2 dormitorios, piso alto con mejor vista. Precio: $98,900 USD.",
+    "imagen_planta": ""
+  }
+},
+{
+  "model": "projects.departamento",
+  "pk": 3,
+  "fields": {
+    "nivel": 3,
+    "codigo": "1102",
+    "tipo": "2dorm",
+    "area_total": "69.67",
+    "area_techada": "65.00",
+    "precio": "98900.00",
+    "estado": "disponible",
+    "descripcion": "2 dormitorios, ultimo piso disponible. Precio: $98,900 USD.",
+    "imagen_planta": ""
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 1,
+  "fields": {
+    "proyecto": 4,
+    "titulo": "Proyecto finalizado",
+    "contenido": "MIRA VERDE ha sido completamente entregado. Todos los departamentos fueron vendidos exitosamente.",
+    "imagen": "avances/mira-verde-avance-3._avance_1.png",
+    "fecha": "2020-12-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 2,
+  "fields": {
+    "proyecto": 5,
+    "titulo": "Proyecto entregado",
+    "contenido": "BOLÍVAR 205 fue completamente entregado en 2024. Todos los departamentos fueron vendidos.",
+    "imagen": "avances/bolivar-205-avance-3._avance_1.png",
+    "fecha": "2024-06-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 3,
+  "fields": {
+    "proyecto": 6,
+    "titulo": "Inicio de construcción",
+    "contenido": "Se iniciaron los trabajos de construcción de PARKE 10. Cimientos y estructura en progreso.",
+    "imagen": "avances/parke-10-avance-1._inicio.png",
+    "fecha": "2025-03-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 4,
+  "fields": {
+    "proyecto": 6,
+    "titulo": "Avance 2026",
+    "contenido": "Estructura avanzada. Departamentos en preventa disponibles.",
+    "imagen": "avances/parke-10-avance-3._avance_1.png",
+    "fecha": "2026-01-15",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 5,
+  "fields": {
+    "proyecto": 7,
+    "titulo": "Inicio de construcción",
+    "contenido": "Se iniciaron los trabajos de CATÓLICA. Demolición completada, excavación en progreso.",
+    "imagen": "avances/catolica-avance-1._inicio.png",
+    "fecha": "2025-06-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 6,
+  "fields": {
+    "proyecto": 7,
+    "titulo": "Avance 2026",
+    "contenido": "Estructura de sótanos completada. Primeros niveles en construcción.",
+    "imagen": "avances/catolica-avance-2._demolicion.png",
+    "fecha": "2026-02-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 7,
+  "fields": {
+    "proyecto": 8,
+    "titulo": "Inicio de construcción",
+    "contenido": "Se iniciaron los trabajos de BOREAL. Cimentación en progreso.",
+    "imagen": "avances/boreal-avance-2._demolición_2.png",
+    "fecha": "2026-01-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 8,
+  "fields": {
+    "proyecto": 6,
+    "titulo": "Proyecto entregado",
+    "contenido": "PARKE 10 fue completamente entregado. Todas las 52 unidades fueron vendidas.",
+    "imagen": "avances/parke-10-avance-2._demolicion.png",
+    "fecha": "2025-03-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 9,
+  "fields": {
+    "proyecto": 8,
+    "titulo": "Proyecto entregado",
+    "contenido": "BOREAL fue completamente entregado. Todas las 34 unidades fueron vendidas.",
+    "imagen": "avances/boreal-avance-2._demolición_1.png",
+    "fecha": "2025-12-01",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 10,
+  "fields": {
+    "proyecto": 4,
+    "titulo": "Avance de obra #1",
+    "contenido": "Registro fotográfico: Avance de obra #1",
+    "imagen": "avances/mira-verde-avance-3_CAcgbsI._avance_1.png",
+    "fecha": "2026-03-31",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 11,
+  "fields": {
+    "proyecto": 4,
+    "titulo": "Avance de obra #2",
+    "contenido": "Registro fotográfico: Avance de obra #2",
+    "imagen": "avances/mira-verde-avance-3._avance_2.png",
+    "fecha": "2026-03-31",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 12,
+  "fields": {
+    "proyecto": 5,
+    "titulo": "Avance de obra #2",
+    "contenido": "Registro fotográfico: Avance de obra #2",
+    "imagen": "avances/bolivar-205-avance-3._avance_2.png",
+    "fecha": "2026-03-31",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 13,
+  "fields": {
+    "proyecto": 7,
+    "titulo": "Avance de obra",
+    "contenido": "Registro fotográfico: Avance de obra",
+    "imagen": "avances/catolica-avance-3._avance.png",
+    "fecha": "2026-03-31",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 14,
+  "fields": {
+    "proyecto": 8,
+    "titulo": "Avance de obra #1",
+    "contenido": "Registro fotográfico: Avance de obra #1",
+    "imagen": "avances/boreal-avance-3._avance_1.png",
+    "fecha": "2026-03-31",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.avancedeobra",
+  "pk": 15,
+  "fields": {
+    "proyecto": 8,
+    "titulo": "Avance de obra #2",
+    "contenido": "Registro fotográfico: Avance de obra #2",
+    "imagen": "avances/boreal-avance-3._avance_2.png",
+    "fecha": "2026-03-31",
+    "publicado": true
+  }
+},
+{
+  "model": "projects.videoproyecto",
+  "pk": 1,
+  "fields": {
+    "proyecto": 4,
+    "titulo": "Recorrido Mira Verde",
+    "youtube_url": "https://www.youtube.com/watch?v=wuVcPvby4dk",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.videoproyecto",
+  "pk": 2,
+  "fields": {
+    "proyecto": 7,
+    "titulo": "Recorrido Católica",
+    "youtube_url": "https://www.youtube.com/watch?v=wOemHf9-5AE",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.videoproyecto",
+  "pk": 3,
+  "fields": {
+    "proyecto": 8,
+    "titulo": "Recorrido Boreal",
+    "youtube_url": "https://www.youtube.com/watch?v=_LX6OAUEYjQ",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 1,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-1_NoqFHf6.png",
+    "descripcion": "Mira Verde - Foto 1",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 2,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-2_ZrREnkP.png",
+    "descripcion": "Mira Verde - Foto 2",
+    "orden": 2
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 3,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-3_Vlmaizf.png",
+    "descripcion": "Mira Verde - Foto 3",
+    "orden": 3
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 4,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-4_PAlrxzn.png",
+    "descripcion": "Mira Verde - Foto 4",
+    "orden": 4
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 5,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-5_uVu6F7W.png",
+    "descripcion": "Mira Verde - Foto 5",
+    "orden": 5
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 6,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-6_QGaCOWO.png",
+    "descripcion": "Mira Verde - Foto 6",
+    "orden": 6
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 7,
+  "fields": {
+    "proyecto": 4,
+    "imagen": "galeria/mira-verde-galeria-7_vVdtgnA.png",
+    "descripcion": "Mira Verde - Foto 7",
+    "orden": 7
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 8,
+  "fields": {
+    "proyecto": 5,
+    "imagen": "galeria/bolivar-205-galeria-1_DSMQggK.png",
+    "descripcion": "Bolívar 205 - Foto 1",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 9,
+  "fields": {
+    "proyecto": 5,
+    "imagen": "galeria/bolivar-205-galeria-2_Li88V97.png",
+    "descripcion": "Bolívar 205 - Foto 2",
+    "orden": 2
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 10,
+  "fields": {
+    "proyecto": 5,
+    "imagen": "galeria/bolivar-205-galeria-3_qH0Lp5S.png",
+    "descripcion": "Bolívar 205 - Foto 3",
+    "orden": 3
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 11,
+  "fields": {
+    "proyecto": 5,
+    "imagen": "galeria/bolivar-205-galeria-4_VjEVOe2.png",
+    "descripcion": "Bolívar 205 - Foto 4",
+    "orden": 4
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 12,
+  "fields": {
+    "proyecto": 5,
+    "imagen": "galeria/bolivar-205-galeria-5_nT8j3HH.png",
+    "descripcion": "Bolívar 205 - Foto 5",
+    "orden": 5
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 13,
+  "fields": {
+    "proyecto": 6,
+    "imagen": "galeria/parke-10-galeria-1_77eHRht.png",
+    "descripcion": "Parke 10 - Foto 1",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 14,
+  "fields": {
+    "proyecto": 6,
+    "imagen": "galeria/parke-10-galeria-2_Rk9WgZl.png",
+    "descripcion": "Parke 10 - Foto 2",
+    "orden": 2
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 15,
+  "fields": {
+    "proyecto": 6,
+    "imagen": "galeria/parke-10-galeria-3_8sCjFYC.png",
+    "descripcion": "Parke 10 - Foto 3",
+    "orden": 3
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 16,
+  "fields": {
+    "proyecto": 6,
+    "imagen": "galeria/parke-10-galeria-4_sTVqlVM.png",
+    "descripcion": "Parke 10 - Foto 4",
+    "orden": 4
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 17,
+  "fields": {
+    "proyecto": 7,
+    "imagen": "galeria/catolica-galeria-1_rLnzyOu.png",
+    "descripcion": "Católica - Foto 1",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 18,
+  "fields": {
+    "proyecto": 7,
+    "imagen": "galeria/catolica-galeria-2_zCByRwc.png",
+    "descripcion": "Católica - Foto 2",
+    "orden": 2
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 19,
+  "fields": {
+    "proyecto": 7,
+    "imagen": "galeria/catolica-galeria-3_bgdWT8q.png",
+    "descripcion": "Católica - Foto 3",
+    "orden": 3
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 20,
+  "fields": {
+    "proyecto": 7,
+    "imagen": "galeria/catolica-galeria-4_5m0ppJi.png",
+    "descripcion": "Católica - Foto 4",
+    "orden": 4
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 21,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-1_TQ84xp0.png",
+    "descripcion": "Boreal - Foto 1",
+    "orden": 1
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 22,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-2_h1uk4f2.png",
+    "descripcion": "Boreal - Foto 2",
+    "orden": 2
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 23,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-3_pmihq4H.png",
+    "descripcion": "Boreal - Foto 3",
+    "orden": 3
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 24,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-4_tFSzABD.png",
+    "descripcion": "Boreal - Foto 4",
+    "orden": 4
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 25,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-5_izzopcs.png",
+    "descripcion": "Boreal - Foto 5",
+    "orden": 5
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 26,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-6_MfzLW4D.png",
+    "descripcion": "Boreal - Foto 6",
+    "orden": 6
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 27,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-7_rGzP7L9.png",
+    "descripcion": "Boreal - Foto 7",
+    "orden": 7
+  }
+},
+{
+  "model": "projects.imagengaleria",
+  "pk": 28,
+  "fields": {
+    "proyecto": 8,
+    "imagen": "galeria/boreal-galeria-8_JhikYLg.png",
+    "descripcion": "Boreal - Foto 8",
+    "orden": 8
+  }
+},
+{
+  "model": "contact.solicitudcontacto",
+  "pk": 1,
+  "fields": {
+    "nombre": "Test",
+    "apellido": "Final",
+    "email": "test@final.com",
+    "telefono": "987654321",
+    "proyecto_interes": "",
+    "mensaje": "Prueba envio real",
+    "leido": false,
+    "recibido_en": "2026-03-31T17:16:20.511Z"
+  }
+},
+{
+  "model": "contact.solicitudcontacto",
+  "pk": 2,
+  "fields": {
+    "nombre": "Test",
+    "apellido": "User",
+    "email": "test@test.com",
+    "telefono": "+51999888777",
+    "proyecto_interes": "catolica",
+    "mensaje": "Consulta de prueba desde script",
+    "leido": false,
+    "recibido_en": "2026-04-17T20:26:49.782Z"
+  }
+},
+{
+  "model": "contact.solicitudcontacto",
+  "pk": 3,
+  "fields": {
+    "nombre": "Stephano",
+    "apellido": "QA Test",
+    "email": "stephano.cornejoc@gmail.com",
+    "telefono": "+51999888777",
+    "proyecto_interes": "catolica",
+    "mensaje": "Email de prueba desde IBYZA + Resend. Si lees esto, la integracion funciona correctamente.",
+    "leido": false,
+    "recibido_en": "2026-04-17T21:13:06.034Z"
+  }
+},
+{
+  "model": "contact.solicitudcontacto",
+  "pk": 4,
+  "fields": {
+    "nombre": "Test",
+    "apellido": "Resend",
+    "email": "cliente.prueba@ejemplo.com",
+    "telefono": "+51999888777",
+    "proyecto_interes": "catolica",
+    "mensaje": "Probando integracion con Resend. Si lees este email, todo funciona end-to-end.",
+    "leido": false,
+    "recibido_en": "2026-04-17T21:18:11.191Z"
+  }
+},
+{
+  "model": "contact.solicitudcita",
+  "pk": 1,
+  "fields": {
+    "nombre": "Test",
+    "apellido": "Meet",
+    "email": "test@meet.com",
+    "telefono": "987654321",
+    "tipo": "virtual",
+    "fecha_preferida": "2026-04-16T20:00:00Z",
+    "mensaje": "",
+    "estado": "pendiente",
+    "recibido_en": "2026-03-31T17:16:20.711Z"
+  }
+},
+{
+  "model": "contact.solicitudcita",
+  "pk": 2,
+  "fields": {
+    "nombre": "Stephano",
+    "apellido": "Cornejo",
+    "email": "stephano.cornejoc@gmail.com",
+    "telefono": "940183490",
+    "tipo": "presencial",
+    "fecha_preferida": "2026-04-21T18:30:00Z",
+    "mensaje": "",
+    "estado": "pendiente",
+    "recibido_en": "2026-04-17T20:07:29.407Z"
+  }
+},
+{
+  "model": "contact.solicitudcita",
+  "pk": 3,
+  "fields": {
+    "nombre": "Stephano",
+    "apellido": "Prueba Cita",
+    "email": "stephano.cornejoc@gmail.com",
+    "telefono": "+51999888777",
+    "tipo": "presencial",
+    "fecha_preferida": "2026-04-25T15:30:00Z",
+    "mensaje": "Me gustaria agendar una visita al proyecto Catolica el 25 de abril.",
+    "estado": "pendiente",
+    "recibido_en": "2026-04-17T21:22:46.323Z"
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 1,
+  "fields": {
+    "seccion": "hero",
+    "clave": "titulo",
+    "valor": "Tu mejor inversión al mejor precio y en la mejor ubicación",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 2,
+  "fields": {
+    "seccion": "hero",
+    "clave": "subtitulo",
+    "valor": "Desarrollamos proyectos inmobiliarios que generan valor en las mejores zonas de Arequipa.",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 3,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "mision",
+    "valor": "Desarrollar proyectos inmobiliarios en áreas consolidadas de Arequipa, generando mayor valor para nuestros clientes a través de ubicaciones estratégicas, diseño funcional y acabados de calidad.",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 4,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "vision",
+    "valor": "Ser el referente local en desarrollo inmobiliario sostenible, reconocidos por la calidad de nuestros proyectos y el valor que generamos para inversionistas y familias.",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 5,
+  "fields": {
+    "seccion": "contacto",
+    "clave": "direccion",
+    "valor": "Puente Bolívar 205, Umacollo, Arequipa",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 6,
+  "fields": {
+    "seccion": "contacto",
+    "clave": "telefono",
+    "valor": "+51 993 674 174",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 7,
+  "fields": {
+    "seccion": "footer",
+    "clave": "slogan",
+    "valor": "Tu mejor inversión al mejor precio y en la mejor ubicación.",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 8,
+  "fields": {
+    "seccion": "footer",
+    "clave": "whatsapp",
+    "valor": "51953728070",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 9,
+  "fields": {
+    "seccion": "hero",
+    "clave": "cta_texto",
+    "valor": "Conoce nuestros proyectos",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 10,
+  "fields": {
+    "seccion": "hero",
+    "clave": "indicador_anos",
+    "valor": "6",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 11,
+  "fields": {
+    "seccion": "hero",
+    "clave": "indicador_vendidas",
+    "valor": "195",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 12,
+  "fields": {
+    "seccion": "hero",
+    "clave": "indicador_entregadas",
+    "valor": "50",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 13,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "historia",
+    "valor": "IBYZA nace en 2020 con nuestro primer proyecto inmobiliario. El nombre surge de la unión de los apellidos Ibáñez y Zavala. Desde el inicio, hemos dedicado especial atención a escuchar a nuestros clientes y mejorar continuamente, consolidándonos como una empresa de confianza en el sector inmobiliario de Arequipa.",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 14,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "valores",
+    "valor": "Compromiso, Integridad, Innovación, Sostenibilidad, Profesionalismo",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 15,
+  "fields": {
+    "seccion": "contacto",
+    "clave": "email",
+    "valor": "ventas@ibyzacorp.com",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 16,
+  "fields": {
+    "seccion": "contacto",
+    "clave": "horario",
+    "valor": "Lunes a viernes: 9:00 AM – 6:00 PM | Sábados: 9:00 AM – 1:00 PM",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 17,
+  "fields": {
+    "seccion": "contacto",
+    "clave": "whatsapp",
+    "valor": "+51993674174",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 18,
+  "fields": {
+    "seccion": "contacto",
+    "clave": "google_maps_url",
+    "valor": "https://maps.app.goo.gl/V3n7qrHMhNoHf2of7",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 19,
+  "fields": {
+    "seccion": "footer",
+    "clave": "facebook",
+    "valor": "https://www.facebook.com/profile.php?id=61580984001744",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 20,
+  "fields": {
+    "seccion": "footer",
+    "clave": "dominio",
+    "valor": "ibyzacorp.com",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 21,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "stat_anos",
+    "valor": "6",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 22,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "stat_vendidas",
+    "valor": "195",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 23,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "stat_proyectos",
+    "valor": "6",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 24,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "stat_entregadas",
+    "valor": "50",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.contenidoweb",
+  "pk": 25,
+  "fields": {
+    "seccion": "nosotros",
+    "clave": "propuesta_valor",
+    "valor": "Dedicamos especial atención a escuchar a nuestros clientes y mejorar continuamente. Cada proyecto es construido con los más altos estándares, garantizando que tu inversión sea segura.",
+    "imagen": "",
+    "activo": true
+  }
+},
+{
+  "model": "content.configuracionsitio",
+  "pk": 1,
+  "fields": {
+    "direccion": "Puente Bolivar 205, Umacollo, Arequipa",
+    "telefono": "+51 993 674 174",
+    "email": "ventas@ibyzacorp.com",
+    "horario": "Lun-Vie: 9:00 AM - 6:00 PM | Sab: 9:00 AM - 1:00 PM",
+    "whatsapp": "+51993674174",
+    "facebook_url": "https://www.facebook.com/profile.php?id=61580984001744",
+    "instagram_url": "",
+    "tiktok_url": "",
+    "linkedin_url": "",
+    "youtube_url": "",
+    "slogan": "Tu mejor inversión al mejor precio y en la mejor ubicación",
+    "descripcion_empresa": "Somos una empresa de servicios generales que cuenta con profesionales altamente calificados."
+  }
+},
+{
+  "model": "content.preguntafrecuente",
+  "pk": 1,
+  "fields": {
+    "pregunta": "Cuanto demora el proceso de separacion?",
+    "respuesta": "La separacion se confirma en 24 horas habiles tras verificar el pago.",
+    "orden": 1,
+    "activo": true
+  }
+},
+{
+  "model": "content.preguntafrecuente",
+  "pk": 2,
+  "fields": {
+    "pregunta": "Como puedo agendar una visita al proyecto?",
+    "respuesta": "Desde la pagina de contacto puedes agendar una visita. Te contactaremos para confirmar.",
+    "orden": 2,
+    "activo": true
+  }
+},
+{
+  "model": "content.preguntafrecuente",
+  "pk": 3,
+  "fields": {
+    "pregunta": "Cuales son los metodos de pago aceptados?",
+    "respuesta": "Aceptamos tarjetas de credito/debito via Culqi y transferencia bancaria.",
+    "orden": 3,
+    "activo": true
+  }
+},
+{
+  "model": "content.preguntafrecuente",
+  "pk": 4,
+  "fields": {
+    "pregunta": "Hay opciones de financiamiento?",
+    "respuesta": "Si, trabajamos con varios bancos para ofrecer creditos hipotecarios. Consulta con un asesor.",
+    "orden": 4,
+    "activo": true
+  }
+},
+{
+  "model": "content.preguntafrecuente",
+  "pk": 5,
+  "fields": {
+    "pregunta": "Los departamentos estan entregados?",
+    "respuesta": "Depende del proyecto. Revisa el estado (\"en venta\", \"preventa\", \"entregado\") en cada proyecto.",
+    "orden": 5,
+    "activo": true
+  }
+},
+{
+  "model": "content.testimonio",
+  "pk": 1,
+  "fields": {
+    "nombre": "Maria Gonzales",
+    "cargo": "Propietaria Mira Verde",
+    "proyecto": null,
+    "testimonio": "Excelente experiencia, el proceso fue transparente y profesional.",
+    "foto": "",
+    "calificacion": 5,
+    "orden": 1,
+    "activo": true
+  }
+},
+{
+  "model": "content.testimonio",
+  "pk": 2,
+  "fields": {
+    "nombre": "Carlos Mendoza",
+    "cargo": "Inversionista",
+    "proyecto": null,
+    "testimonio": "Inverti en Bolivar 205 y fue la mejor decision. Recomiendo IBYZA.",
+    "foto": "",
+    "calificacion": 5,
+    "orden": 2,
+    "activo": true
+  }
+},
+{
+  "model": "content.testimonio",
+  "pk": 3,
+  "fields": {
+    "nombre": "Ana Rodriguez",
+    "cargo": "Propietaria Boreal",
+    "proyecto": null,
+    "testimonio": "El equipo fue amable y la entrega puntual. Muy satisfecha.",
+    "foto": "",
+    "calificacion": 5,
+    "orden": 3,
+    "activo": true
+  }
+},
+{
+  "model": "content.beneficio",
+  "pk": 1,
+  "fields": {
+    "titulo": "Ubicacion privilegiada",
+    "descripcion": "Todos nuestros proyectos estan en zonas consolidadas de Arequipa.",
+    "icono": "MapPin",
+    "orden": 1,
+    "activo": true
+  }
+},
+{
+  "model": "content.beneficio",
+  "pk": 2,
+  "fields": {
+    "titulo": "Calidad garantizada",
+    "descripcion": "Construimos con los mas altos estandares y acabados premium.",
+    "icono": "ShieldCheck",
+    "orden": 2,
+    "activo": true
+  }
+},
+{
+  "model": "content.beneficio",
+  "pk": 3,
+  "fields": {
+    "titulo": "Asesoria personalizada",
+    "descripcion": "Un asesor te acompana en todo el proceso de compra.",
+    "icono": "HeadphonesIcon",
+    "orden": 3,
+    "activo": true
+  }
+},
+{
+  "model": "content.beneficio",
+  "pk": 4,
+  "fields": {
+    "titulo": "Financiamiento flexible",
+    "descripcion": "Trabajamos con los principales bancos del pais.",
+    "icono": "CreditCard",
+    "orden": 4,
+    "activo": true
+  }
+}
+]
