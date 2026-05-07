@@ -219,21 +219,32 @@ class Command(BaseCommand):
 
     def _cargar_fachada(self, proyecto):
         """
-        Si el proyecto fue recien creado y no tiene fachada, intenta cargarla
-        desde seed_assets/proyectos/<slug>/fachada.<ext>.
-        Solo se ejecuta cuando created=True para no pisar fachadas que Diana
-        haya cambiado desde el admin.
+        Carga la fachada desde seed_assets/proyectos/<slug>/fachada.<ext> al
+        ImageField si el campo esta vacio O si apunta a un archivo que ya no
+        existe en el storage activo (caso tipico: filesystem efimero de Render
+        que pierde media/ en cada deploy).
+
+        NO recarga si la fachada existe fisicamente — eso preserva cualquier
+        imagen que Diana haya subido desde el admin.
         """
         seed_assets = Path(settings.BASE_DIR) / 'seed_assets' / 'proyectos' / proyecto.slug
         if not seed_assets.exists():
             return False
 
         fachada_path = next(iter(seed_assets.glob('fachada.*')), None)
-        if fachada_path and not proyecto.imagen_fachada:
-            with open(fachada_path, 'rb') as f:
-                proyecto.imagen_fachada.save(fachada_path.name, File(f), save=True)
-            return True
-        return False
+        if not fachada_path:
+            return False
+
+        # Solo recargamos si NO hay imagen, o si el archivo fisico desaparecio
+        ya_existe = bool(proyecto.imagen_fachada) and proyecto.imagen_fachada.storage.exists(
+            proyecto.imagen_fachada.name
+        )
+        if ya_existe:
+            return False
+
+        with open(fachada_path, 'rb') as f:
+            proyecto.imagen_fachada.save(fachada_path.name, File(f), save=True)
+        return True
 
     def handle(self, *args, **options):
         if options['clear']:
@@ -257,15 +268,17 @@ class Command(BaseCommand):
             if created:
                 created_count += 1
                 self.stdout.write(self.style.SUCCESS(f'  + Creado: {proyecto.nombre}'))
-                # Solo cargamos la fachada en la primera creacion del proyecto
-                if self._cargar_fachada(proyecto):
-                    fachadas_cargadas += 1
-                    self.stdout.write(self.style.SUCCESS(
-                        f'    fachada cargada desde seed_assets'
-                    ))
             else:
                 skipped_count += 1
                 self.stdout.write(f'  = Ya existia (no tocado): {proyecto.nombre}')
+
+            # Cargar fachada si falta (sea porque el proyecto es nuevo, o porque
+            # el archivo fisico se perdio en el ultimo deploy de Render efimero).
+            if self._cargar_fachada(proyecto):
+                fachadas_cargadas += 1
+                self.stdout.write(self.style.SUCCESS(
+                    f'    fachada cargada desde seed_assets'
+                ))
 
             # Videos: get_or_create por (proyecto, youtube_url)
             for video_data in videos:
