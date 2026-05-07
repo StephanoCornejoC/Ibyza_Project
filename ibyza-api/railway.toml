@@ -3,7 +3,7 @@ builder = "NIXPACKS"
 buildCommand = "pip install -r requirements.txt && python manage.py collectstatic --noinput"
 
 [deploy]
-startCommand = "python manage.py migrate --noinput && python manage.py createcachetable django_cache_table && python manage.py create_admin && gunicorn ibyza.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+startCommand = "python manage.py migrate --noinput && python manage.py createcachetable django_cache_table && python manage.py create_admin && python manage.py seed_contenido && python manage.py seed_proyectos && gunicorn ibyza.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
 healthcheckPath = "/healthz/"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"

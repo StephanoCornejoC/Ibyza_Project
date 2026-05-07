@@ -164,10 +164,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         created_count = 0
-        updated_count = 0
+        skipped_count = 0
 
         for data in CONTENIDOS:
-            obj, created = ContenidoWeb.objects.update_or_create(
+            obj, created = ContenidoWeb.objects.get_or_create(
                 seccion=data['seccion'],
                 clave=data['clave'],
                 defaults={'valor': data['valor'], 'activo': True},
@@ -175,10 +175,10 @@ class Command(BaseCommand):
             if created:
                 created_count += 1
             else:
-                updated_count += 1
+                skipped_count += 1
 
         self.stdout.write(self.style.SUCCESS(
-            f'Contenido cargado: {created_count} creados, {updated_count} actualizados.'
+            f'Contenido cargado: {created_count} creados, {skipped_count} ya existian (no tocados).'
         ))
         self.stdout.write(self.style.WARNING(
             'NOTA: Las imágenes del hero y nosotros deben cargarse desde el panel de administración.'

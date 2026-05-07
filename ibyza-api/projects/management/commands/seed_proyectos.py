@@ -8,6 +8,9 @@ Uso:
 """
 from decimal import Decimal
 from datetime import date
+from pathlib import Path
+from django.conf import settings
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from projects.models import Proyecto, Nivel, Departamento, AvanceDeObra, VideoProyecto
 
@@ -202,41 +205,67 @@ class Command(BaseCommand):
             help='Elimina todos los proyectos existentes antes de crear los nuevos.',
         )
 
+    def _cargar_fachada(self, proyecto):
+        """
+        Si el proyecto fue recien creado y no tiene fachada, intenta cargarla
+        desde seed_assets/proyectos/<slug>/fachada.<ext>.
+        Solo se ejecuta cuando created=True para no pisar fachadas que Diana
+        haya cambiado desde el admin.
+        """
+        seed_assets = Path(settings.BASE_DIR) / 'seed_assets' / 'proyectos' / proyecto.slug
+        if not seed_assets.exists():
+            return False
+
+        fachada_path = next(iter(seed_assets.glob('fachada.*')), None)
+        if fachada_path and not proyecto.imagen_fachada:
+            with open(fachada_path, 'rb') as f:
+                proyecto.imagen_fachada.save(fachada_path.name, File(f), save=True)
+            return True
+        return False
+
     def handle(self, *args, **options):
         if options['clear']:
             self.stdout.write(self.style.WARNING('Eliminando proyectos existentes...'))
             Proyecto.objects.all().delete()
 
         created_count = 0
-        updated_count = 0
+        skipped_count = 0
+        fachadas_cargadas = 0
 
         for data in PROYECTOS:
             videos = data.pop('videos', [])
             avances = data.pop('avances', [])
 
-            proyecto, created = Proyecto.objects.update_or_create(
-                slug=data['slug'],
+            slug = data['slug']
+            proyecto, created = Proyecto.objects.get_or_create(
+                slug=slug,
                 defaults=data,
             )
 
             if created:
                 created_count += 1
                 self.stdout.write(self.style.SUCCESS(f'  + Creado: {proyecto.nombre}'))
+                # Solo cargamos la fachada en la primera creacion del proyecto
+                if self._cargar_fachada(proyecto):
+                    fachadas_cargadas += 1
+                    self.stdout.write(self.style.SUCCESS(
+                        f'    fachada cargada desde seed_assets'
+                    ))
             else:
-                updated_count += 1
-                self.stdout.write(f'  ~ Actualizado: {proyecto.nombre}')
+                skipped_count += 1
+                self.stdout.write(f'  = Ya existia (no tocado): {proyecto.nombre}')
 
-            # Videos
+            # Videos: get_or_create por (proyecto, youtube_url)
             for video_data in videos:
-                VideoProyecto.objects.update_or_create(
+                VideoProyecto.objects.get_or_create(
                     proyecto=proyecto,
                     youtube_url=video_data['youtube_url'],
                     defaults=video_data,
                 )
 
-            # Avances de obra
+            # Avances de obra: get_or_create por (proyecto, titulo)
             for avance_data in avances:
-                AvanceDeObra.objects.update_or_create(
+                AvanceDeObra.objects.get_or_create(
                     proyecto=proyecto,
                     titulo=avance_data['titulo'],
                     defaults=avance_data,
@@ -244,11 +273,13 @@ class Command(BaseCommand):
 
         self.stdout.write('')
         self.stdout.write(self.style.SUCCESS(
-            f'Seed completado: {created_count} creados, {updated_count} actualizados.'
+            f'Seed completado: {created_count} creados, '
+            f'{skipped_count} ya existian (no tocados), '
+            f'{fachadas_cargadas} fachadas cargadas desde seed_assets.'
         ))
         self.stdout.write(self.style.WARNING(
-            'NOTA: Las imágenes (fachadas, planos, galería) y el catálogo PDF '
-            'deben cargarse manualmente desde el panel de administración Django.'
+            'NOTA: Las imagenes de galeria, planos y catalogo PDF se cargan '
+            'desde el panel de administracion Django.'
         ))
         self.stdout.write(self.style.WARNING(
             'NOTA: Los departamentos individuales con metrajes y precios deben '
