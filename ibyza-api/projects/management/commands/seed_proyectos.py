@@ -15,6 +15,18 @@ from django.core.management.base import BaseCommand
 from projects.models import Proyecto, Nivel, Departamento, AvanceDeObra, VideoProyecto
 
 
+# Departamentos disponibles iniciales por slug de proyecto.
+# Solo Catolica tiene unidades disponibles segun la documentacion del cliente.
+# El resto de proyectos esta vendido o en preventa sin unidades cargadas todavia.
+DEPARTAMENTOS_DISPONIBLES = {
+    'catolica': [
+        {'piso': 9,  'codigo': '901',  'tipo': '2dorm', 'area_total': Decimal('69.67'), 'area_techada': Decimal('65.00'), 'precio': Decimal('98900'), 'estado': 'disponible'},
+        {'piso': 10, 'codigo': '1001', 'tipo': '2dorm', 'area_total': Decimal('69.67'), 'area_techada': Decimal('65.00'), 'precio': Decimal('98900'), 'estado': 'disponible'},
+        {'piso': 11, 'codigo': '1101', 'tipo': '2dorm', 'area_total': Decimal('69.67'), 'area_techada': Decimal('65.00'), 'precio': Decimal('98900'), 'estado': 'disponible'},
+    ],
+}
+
+
 # ══════════════════════════════════════════════════════════════════════════════
 # DATOS REALES DE IBYZA — Fuente: documentación del cliente
 # ══════════════════════════════════════════════════════════════════════════════
@@ -269,6 +281,25 @@ class Command(BaseCommand):
                     proyecto=proyecto,
                     titulo=avance_data['titulo'],
                     defaults=avance_data,
+                )
+
+            # Departamentos disponibles iniciales (idempotente por codigo+nivel)
+            for depto_data in DEPARTAMENTOS_DISPONIBLES.get(slug, []):
+                nivel, _ = Nivel.objects.get_or_create(
+                    proyecto=proyecto,
+                    numero=depto_data['piso'],
+                    defaults={'nombre': f'Piso {depto_data["piso"]}', 'orden': depto_data['piso']},
+                )
+                Departamento.objects.get_or_create(
+                    nivel=nivel,
+                    codigo=depto_data['codigo'],
+                    defaults={
+                        'tipo': depto_data['tipo'],
+                        'area_total': depto_data['area_total'],
+                        'area_techada': depto_data['area_techada'],
+                        'precio': depto_data['precio'],
+                        'estado': depto_data['estado'],
+                    },
                 )
 
         self.stdout.write('')
