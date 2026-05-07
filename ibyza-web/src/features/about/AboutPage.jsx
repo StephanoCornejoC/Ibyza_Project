@@ -38,7 +38,7 @@ const AboutPage = () => {
         <title>Nosotros | IBYZA</title>
         <meta
           name="description"
-          content="Conoce la historia, mision, vision y valores de IBYZA. Una inmobiliaria comprometida con la calidad."
+          content="Conoce la historia, misión, visión y valores de IBYZA. Una inmobiliaria comprometida con la calidad."
         />
       </Helmet>
 

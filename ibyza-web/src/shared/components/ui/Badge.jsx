@@ -13,8 +13,9 @@ export const Badge = ({ status, size = 'md', ...props }) => {
     separado: 'Separado',
     vendido: 'Vendido',
     en_construccion: 'En construcción',
-    en_venta: 'En venta',
+    en_venta: 'Disponible',
     entregado: 'Entregado',
+    preventa: 'Preventa',
   };
 
   return (
@@ -57,6 +58,11 @@ const statusStyles = {
     color: rgba(255,255,255,0.65);
     border-color: rgba(255, 255, 255, 0.15);
   `,
+  preventa: css`
+    background-color: rgba(56, 189, 248, 0.12);
+    color: #7dd3fc;
+    border-color: rgba(56, 189, 248, 0.35);
+  `,
 };
 
 const dotColors = {
@@ -66,6 +72,7 @@ const dotColors = {
   en_construccion: '#a5b4fc',
   en_venta: '#FFE499',
   entregado: 'rgba(255,255,255,0.6)',
+  preventa: '#7dd3fc',
 };
 
 const StyledBadge = styled.span`

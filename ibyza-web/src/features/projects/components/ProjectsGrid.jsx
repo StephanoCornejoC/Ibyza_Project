@@ -29,7 +29,7 @@ export const ProjectsGrid = ({ projects, loading, error }) => {
       <EmptyState
         icon={Building2}
         title="Sin proyectos disponibles"
-        description="No se encontraron proyectos que coincidan con tu busqueda."
+        description="No se encontraron proyectos que coincidan con tu búsqueda."
       />
     );
   }

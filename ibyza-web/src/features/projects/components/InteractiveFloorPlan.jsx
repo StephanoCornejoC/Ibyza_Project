@@ -67,7 +67,7 @@ const InteractiveFloorPlan = ({ niveles = [], project = null }) => {
                   <PlaceholderText>
                     Plano de planta no disponible para este nivel.
                     <br />
-                    Sera subido proximamente desde el panel admin.
+                    Será subido próximamente desde el panel admin.
                   </PlaceholderText>
                 </PlanPlaceholder>
               )}
@@ -142,14 +142,14 @@ const InteractiveFloorPlan = ({ niveles = [], project = null }) => {
               <DetailCard>
                 <Maximize2 size={16} />
                 <div>
-                  <DetailLabel>Area total</DetailLabel>
+                  <DetailLabel>Área total</DetailLabel>
                   <DetailValue>{formatArea(selectedDept.area_total)}</DetailValue>
                 </div>
               </DetailCard>
               <DetailCard>
                 <Maximize2 size={16} />
                 <div>
-                  <DetailLabel>Area techada</DetailLabel>
+                  <DetailLabel>Área techada</DetailLabel>
                   <DetailValue>{formatArea(selectedDept.area_techada)}</DetailValue>
                 </div>
               </DetailCard>

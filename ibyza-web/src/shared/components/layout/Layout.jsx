@@ -15,6 +15,8 @@ import useUIStore from '@/shared/stores/useUIStore';
 
 // Modal global de separacion — cargado lazy para no bloquear el render inicial
 const SeparationModal = lazy(() => import('@/features/separation/SeparationModal'));
+// Modal de bienvenida configurable desde el CMS — lazy para no bloquear el primer paint
+const WelcomeModal = lazy(() => import('@/features/home/components/WelcomeModal'));
 
 /**
  * Layout — Envuelve todas las páginas con Navbar, Footer y transiciones.
@@ -83,6 +85,11 @@ export const Layout = ({
 
       {/* Modal global de separacion — disponible desde cualquier pagina */}
       <GlobalSeparationModal />
+
+      {/* Modal de bienvenida CMS — visible en cualquier ruta segun config.modal_activo */}
+      <Suspense fallback={null}>
+        <WelcomeModal />
+      </Suspense>
     </>
   );
 };

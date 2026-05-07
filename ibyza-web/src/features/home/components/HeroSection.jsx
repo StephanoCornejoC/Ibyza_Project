@@ -13,27 +13,46 @@ import { fadeInUp, scaleIn, staggerContainer } from '@/shared/utils/animations'
  * - Imagen de fondo dinamica desde CMS
  * - Sin scroll indicator, sin KPIs
  */
-import heroFallback from '@/assets/images/hero-home-pexels.jpg'
-const HERO_FALLBACK = heroFallback
+import heroDesktopWebp from '@/assets/images/home-hero-1920w.webp'
+import heroDesktopJpg from '@/assets/images/home-hero-1920w.jpg'
+import heroTabletWebp from '@/assets/images/home-hero-1024w.webp'
+import heroTabletJpg from '@/assets/images/home-hero-1024w.jpg'
+import heroMobileWebp from '@/assets/images/home-hero-480w.webp'
+import heroMobileJpg from '@/assets/images/home-hero-480w.jpg'
+import logoBlanco from '@/assets/brand/logo-blanco.png'
+const HERO_FALLBACK = heroDesktopWebp
+const HERO_FALLBACK_JPG = heroDesktopJpg
+const HERO_TABLET_WEBP = heroTabletWebp
+const HERO_TABLET_JPG = heroTabletJpg
+const HERO_MOBILE_WEBP = heroMobileWebp
+const HERO_MOBILE_JPG = heroMobileJpg
 
 const HeroSection = ({ content }) => {
   const slogan =
     content?.titulo ||
-    'Tu mejor inversion al mejor precio y en la mejor ubicacion'
-  const imagenFondo = content?.imagen_fondo || HERO_FALLBACK
+    'Tu mejor inversión al mejor precio y en la mejor ubicación'
+  const imagenFondo = content?.imagen_fondo || null
 
   const canvasRef = useRef(null)
   const particlesRef = useRef([])
   const rafRef = useRef(null)
 
   useEffect(() => {
+    // Respetar prefers-reduced-motion: skip animacion de particles.
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced) return
+
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     let width = (canvas.width = canvas.offsetWidth)
     let height = (canvas.height = canvas.offsetHeight)
 
-    particlesRef.current = Array.from({ length: 50 }, () => ({
+    // En dispositivos tactiles (mobile/tablet) usar menos particles para ahorrar bateria.
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    const particleCount = isCoarsePointer ? 25 : 50
+
+    particlesRef.current = Array.from({ length: particleCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       r: Math.random() * 2 + 0.5,
@@ -86,8 +105,7 @@ const HeroSection = ({ content }) => {
   return (
     <HeroWrapper $bgImage={imagenFondo}>
       <ParticlesCanvas ref={canvasRef} aria-hidden="true" />
-      <HeroOverlay $hasBg={!!imagenFondo} />
-      {!imagenFondo && <GridPattern />}
+      <HeroOverlay $hasBg={true} />
       <GoldGlow />
 
       <HeroContent
@@ -98,8 +116,15 @@ const HeroSection = ({ content }) => {
       >
         {/* Logo IBYZA */}
         <motion.div variants={fadeInUp}>
+          <BrandLogoImg
+            src={logoBlanco}
+            alt="IBYZA"
+            loading="eager"
+            width="160"
+            height="160"
+          />
           <LogoMain>IBYZA</LogoMain>
-          <LogoTagline>Ingenieria y Construccion</LogoTagline>
+          <LogoTagline>Desarrolladora inmobiliaria</LogoTagline>
         </motion.div>
 
         {/* Divider */}
@@ -124,11 +149,11 @@ const HeroSection = ({ content }) => {
         <motion.div variants={scaleIn} transition={{ delay: 1.05 }}>
           <HeroCTAs>
             <PrimaryButton as={Link} to={ROUTES.PROJECTS}>
-              Ver proyectos
+              PROYECTOS DISPONIBLES
               <ArrowRight size={18} />
             </PrimaryButton>
-            <SecondaryButton as={Link} to={ROUTES.CONTACT}>
-              Contactar asesor
+            <SecondaryButton as={Link} to={`${ROUTES.CONTACT}?tab=appointment`}>
+              AGENDAR CITA
             </SecondaryButton>
           </HeroCTAs>
         </motion.div>
@@ -156,10 +181,27 @@ const HeroWrapper = styled.section`
   align-items: center;
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.deepBg};
-  background-image: ${({ $bgImage }) => ($bgImage ? `url(${$bgImage})` : 'none')};
+  background-image: ${({ $bgImage }) =>
+    $bgImage
+      ? `url(${$bgImage})`
+      : `image-set(url(${HERO_FALLBACK}) type("image/webp"), url(${HERO_FALLBACK_JPG}) type("image/jpeg"))`};
   background-size: cover;
   background-position: center;
   overflow: hidden;
+
+  ${({ theme }) => theme.media.tablet} {
+    background-image: ${({ $bgImage }) =>
+      $bgImage
+        ? `url(${$bgImage})`
+        : `image-set(url(${HERO_TABLET_WEBP}) type("image/webp"), url(${HERO_TABLET_JPG}) type("image/jpeg"))`};
+  }
+
+  ${({ theme }) => theme.media.mobile} {
+    background-image: ${({ $bgImage }) =>
+      $bgImage
+        ? `url(${$bgImage})`
+        : `image-set(url(${HERO_MOBILE_WEBP}) type("image/webp"), url(${HERO_MOBILE_JPG}) type("image/jpeg"))`};
+  }
 `
 
 const ParticlesCanvas = styled.canvas`
@@ -226,6 +268,14 @@ const HeroContent = styled.div`
 const shimmerLogo = keyframes`
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
+`
+
+const BrandLogoImg = styled.img`
+  display: block;
+  width: clamp(90px, calc(60px + 4vw), 180px);
+  height: auto;
+  margin: 0 auto ${({ theme }) => theme.spacing.md};
+  object-fit: contain;
 `
 
 const LogoMain = styled.div`

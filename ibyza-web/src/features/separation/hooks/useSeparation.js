@@ -62,7 +62,7 @@ const useSeparation = () => {
         setSeparationResult(res.data);
         setSuccess(true);
         setStep(3);
-        showToast('Separacion exitosa! Te enviamos un correo de confirmacion.', 'success');
+        showToast('¡Separación exitosa! Te enviamos un correo de confirmación.', 'success');
       } catch (err) {
         const msg = err.message || 'Error al procesar el pago. Intenta nuevamente.';
         setError(msg);

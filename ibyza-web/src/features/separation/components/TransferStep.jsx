@@ -1,13 +1,18 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
-import { Upload, Building2, AlertCircle, CheckCircle2, FileImage } from 'lucide-react';
+import { Upload, Building2, AlertCircle, CheckCircle2, FileImage, RefreshCw } from 'lucide-react';
 import { Button } from '@/shared/components/ui/Button';
 import { Spinner } from '@/shared/components/ui/Spinner';
 import { formatPriceUSD } from '@/shared/utils/formatters';
+import api from '@/shared/services/api';
 
 /**
  * TransferStep — Paso 2 alternativo: pago por transferencia bancaria.
- * Muestra datos bancarios + upload de comprobante.
+ *
+ * Solicita los datos bancarios al backend mediante:
+ *   POST /api/proyectos/<slug>/datos-bancarios/  body: { nombre, email }
+ * El endpoint tiene throttle de 5/min/IP. Se maneja error 429 con un mensaje claro
+ * y error 400 (datos faltantes) — aunque el flujo ya garantiza que vienen del paso 1.
  */
 const TransferStep = ({
   formData,
@@ -20,16 +25,66 @@ const TransferStep = ({
 }) => {
   const monto = formData?.monto || department?.precio || 0;
 
-  // Datos bancarios dinámicos del proyecto (cargados desde admin)
-  const bank = {
-    empresa: project?.empresa_receptora || 'IB Y ZA INGENIERIA Y CONSTRUCCION SAC',
-    ruc: project?.empresa_ruc || '20606454776',
-    banco: project?.empresa_banco || 'BCP - Banco de Crédito del Perú',
-    cuentaSoles: project?.cuenta_soles || '215-4217314-0-47',
-    cciSoles: project?.cci_soles || '002-21500421731404728',
-    cuentaDolares: project?.cuenta_dolares || '215-9294966-1-69',
-    cciDolares: project?.cci_dolares || '002-21500929496616925',
-  };
+  // Estado de la solicitud de datos bancarios
+  const [bank, setBank] = useState(null);
+  const [bankLoading, setBankLoading] = useState(false);
+  const [bankError, setBankError] = useState(null);
+
+  const fetchBankData = useCallback(async () => {
+    if (!project?.slug) {
+      setBankError('No se pudo identificar el proyecto. Volvé al paso anterior y reintentá.');
+      return;
+    }
+    if (!formData?.nombre || !formData?.email) {
+      setBankError('Faltan datos del comprador (nombre / email). Volvé al paso 1 y completá el formulario.');
+      return;
+    }
+
+    try {
+      setBankLoading(true);
+      setBankError(null);
+
+      const { data } = await api.post(
+        `/api/proyectos/${project.slug}/datos-bancarios/`,
+        {
+          nombre: `${formData.nombre} ${formData.apellido || ''}`.trim(),
+          email: formData.email,
+        }
+      );
+
+      setBank({
+        empresa: data.empresa_receptora || 'IB Y ZA INGENIERIA Y CONSTRUCCION SAC',
+        ruc: data.empresa_ruc || '',
+        banco: data.empresa_banco || '',
+        cuentaSoles: data.cuenta_soles || '',
+        cciSoles: data.cci_soles || '',
+        cuentaDolares: data.cuenta_dolares || '',
+        cciDolares: data.cci_dolares || '',
+      });
+    } catch (err) {
+      // axios interceptor ya devuelve un Error con un mensaje amigable.
+      // Detectamos throttle (429) y 400 a partir del status si está disponible.
+      const status = err.response?.status;
+      const rawMsg = err.message || '';
+
+      if (status === 429 || /429|throttl|too many|demasiad/i.test(rawMsg)) {
+        setBankError('Estás haciendo demasiadas solicitudes. Esperá un minuto y volvé a intentar.');
+      } else if (status === 400 || /400|nombre|email/i.test(rawMsg)) {
+        setBankError('Faltan datos del comprador (nombre / email). Volvé al paso 1 y revisá los campos.');
+      } else {
+        setBankError(rawMsg || 'No pudimos cargar los datos bancarios. Reintentá.');
+      }
+    } finally {
+      setBankLoading(false);
+    }
+  }, [project?.slug, formData?.nombre, formData?.apellido, formData?.email]);
+
+  // Pedimos los datos bancarios al montar el step.
+  useEffect(() => {
+    fetchBankData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -38,14 +93,12 @@ const TransferStep = ({
     const selected = e.target.files[0];
     if (!selected) return;
 
-    // Validar tipo
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!allowed.includes(selected.type)) {
       alert('Solo se permiten archivos JPEG, PNG, WebP o PDF.');
       return;
     }
 
-    // Validar tamanio (10 MB)
     if (selected.size > 10 * 1024 * 1024) {
       alert('El archivo no debe exceder 10 MB.');
       return;
@@ -76,46 +129,79 @@ const TransferStep = ({
 
   return (
     <StepWrapper>
-      {/* Datos bancarios */}
+      {/* Datos bancarios: loading / error / data */}
       <BankInfo>
         <BankHeader>
           <Building2 size={18} />
           Datos para transferencia
         </BankHeader>
-        <BankDetails>
-          <BankRow>
-            <BankLabel>Empresa</BankLabel>
-            <BankValue>{bank.empresa}</BankValue>
-          </BankRow>
-          <BankRow>
-            <BankLabel>RUC</BankLabel>
-            <BankValue>{bank.ruc}</BankValue>
-          </BankRow>
-          <BankRow>
-            <BankLabel>Banco</BankLabel>
-            <BankValue>{bank.banco}</BankValue>
-          </BankRow>
-          <BankRow>
-            <BankLabel>Cuenta corriente (S/)</BankLabel>
-            <BankValue $mono>{bank.cuentaSoles}</BankValue>
-          </BankRow>
-          <BankRow>
-            <BankLabel>CCI (S/)</BankLabel>
-            <BankValue $mono>{bank.cciSoles}</BankValue>
-          </BankRow>
-          <BankRow>
-            <BankLabel>Cuenta corriente (US$)</BankLabel>
-            <BankValue $mono>{bank.cuentaDolares}</BankValue>
-          </BankRow>
-          <BankRow>
-            <BankLabel>CCI (US$)</BankLabel>
-            <BankValue $mono>{bank.cciDolares}</BankValue>
-          </BankRow>
-          <BankRow $total>
-            <BankLabel>Monto a depositar</BankLabel>
-            <TotalValue>{formatPriceUSD(monto)}</TotalValue>
-          </BankRow>
-        </BankDetails>
+
+        {bankLoading && (
+          <BankLoadingWrapper>
+            <Spinner size="md" />
+            <BankLoadingText>Cargando datos bancarios...</BankLoadingText>
+          </BankLoadingWrapper>
+        )}
+
+        {!bankLoading && bankError && (
+          <BankErrorWrapper>
+            <AlertCircle size={16} />
+            <span>{bankError}</span>
+            <RetryButton type="button" onClick={fetchBankData}>
+              <RefreshCw size={14} />
+              Reintentar
+            </RetryButton>
+          </BankErrorWrapper>
+        )}
+
+        {!bankLoading && !bankError && bank && (
+          <BankDetails>
+            <BankRow>
+              <BankLabel>Empresa</BankLabel>
+              <BankValue>{bank.empresa}</BankValue>
+            </BankRow>
+            {bank.ruc && (
+              <BankRow>
+                <BankLabel>RUC</BankLabel>
+                <BankValue>{bank.ruc}</BankValue>
+              </BankRow>
+            )}
+            {bank.banco && (
+              <BankRow>
+                <BankLabel>Banco</BankLabel>
+                <BankValue>{bank.banco}</BankValue>
+              </BankRow>
+            )}
+            {bank.cuentaSoles && (
+              <BankRow>
+                <BankLabel>Cuenta corriente (S/)</BankLabel>
+                <BankValue $mono>{bank.cuentaSoles}</BankValue>
+              </BankRow>
+            )}
+            {bank.cciSoles && (
+              <BankRow>
+                <BankLabel>CCI (S/)</BankLabel>
+                <BankValue $mono>{bank.cciSoles}</BankValue>
+              </BankRow>
+            )}
+            {bank.cuentaDolares && (
+              <BankRow>
+                <BankLabel>Cuenta corriente (US$)</BankLabel>
+                <BankValue $mono>{bank.cuentaDolares}</BankValue>
+              </BankRow>
+            )}
+            {bank.cciDolares && (
+              <BankRow>
+                <BankLabel>CCI (US$)</BankLabel>
+                <BankValue $mono>{bank.cciDolares}</BankValue>
+              </BankRow>
+            )}
+            <BankRow $total>
+              <BankLabel>Monto a depositar</BankLabel>
+              <TotalValue>{formatPriceUSD(monto)}</TotalValue>
+            </BankRow>
+          </BankDetails>
+        )}
       </BankInfo>
 
       {/* Resumen del comprador */}
@@ -175,7 +261,7 @@ const TransferStep = ({
       </UploadSection>
 
       <InfoNote>
-        Tu separacion quedara en estado <strong>pendiente</strong> hasta que
+        Tu separación quedará en estado <strong>pendiente</strong> hasta que
         nuestro equipo verifique el comprobante. Te notificaremos por correo.
       </InfoNote>
 
@@ -190,7 +276,10 @@ const TransferStep = ({
         <Button variant="outline" onClick={onBack} disabled={loading}>
           Volver
         </Button>
-        <SubmitButton onClick={handleSubmit} disabled={!file || loading}>
+        <SubmitButton
+          onClick={handleSubmit}
+          disabled={!file || loading || bankLoading || !!bankError || !bank}
+        >
           <Upload size={18} />
           Enviar comprobante
         </SubmitButton>
@@ -245,6 +334,52 @@ const BankHeader = styled.div`
   letter-spacing: 3px;
   padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
   border-bottom: 1px solid rgba(14,165,233,0.15);
+`;
+
+const BankLoadingWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacing.md};
+  padding: ${({ theme }) => theme.spacing.xl};
+`;
+
+const BankLoadingText = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textSecondary};
+`;
+
+const BankErrorWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.sm};
+  padding: ${({ theme }) => theme.spacing.lg};
+  color: #f87171;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+
+  svg { flex-shrink: 0; }
+  span { line-height: 1.5; }
+`;
+
+const RetryButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(214,179,112,0.1);
+  border: 1px solid rgba(214,179,112,0.3);
+  color: ${({ theme }) => theme.colors.gold};
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+
+  &:hover {
+    background: rgba(214,179,112,0.2);
+  }
 `;
 
 const BankDetails = styled.div`

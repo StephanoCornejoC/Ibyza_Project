@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion'
  * Color dorado IBYZA. Posicion estable sin saltos.
  */
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '+51993674174'
-const WHATSAPP_MESSAGE = 'Hola, me interesa conocer mas sobre los proyectos de IBYZA.'
+const WHATSAPP_MESSAGE = 'Hola, me interesa conocer más sobre los proyectos de IBYZA.'
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
@@ -35,7 +35,7 @@ const WhatsAppButton = () => {
             exit={{ opacity: 0, x: 8 }}
             transition={{ duration: 0.2 }}
           >
-            Escribenos por WhatsApp
+            Escríbenos por WhatsApp
           </Tooltip>
         )}
       </AnimatePresence>
@@ -80,8 +80,8 @@ const Tooltip = styled.div`
   top: 50%;
   transform: translateY(-50%);
   background: ${({ theme }) => theme.colors.primary};
-  border: 1px solid ${({ theme }) => theme.colors.borderGold};
-  color: ${({ theme }) => theme.colors.gold};
+  border: 1px solid #25D366;
+  color: #25D366;
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: ${({ theme }) => theme.fontSizes.xs};
   font-weight: 600;
@@ -96,7 +96,7 @@ const RippleRing = styled.div`
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid ${({ theme }) => theme.colors.gold};
+  border: 2px solid #25D366;
   animation: ${rippleAnim} 2.5s ease-out infinite;
   pointer-events: none;
 `
@@ -106,14 +106,14 @@ const Button = styled.button`
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  background: ${({ theme }) => theme.gradients.gold};
-  color: ${({ theme }) => theme.colors.deepBg};
+  background: #25D366;
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: none;
-  box-shadow: 0 4px 20px rgba(214,179,112,0.4), 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px rgba(37,211,102,0.4), 0 4px 12px rgba(0,0,0,0.3);
   transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   flex-shrink: 0;
 
@@ -126,7 +126,7 @@ const Button = styled.button`
 
   &:hover {
     transform: scale(1.1);
-    box-shadow: 0 8px 32px rgba(214,179,112,0.55), 0 4px 12px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 32px rgba(37,211,102,0.55), 0 4px 12px rgba(0,0,0,0.3);
   }
 
   &:active {
@@ -134,7 +134,7 @@ const Button = styled.button`
   }
 
   &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.gold};
+    outline: 2px solid #25D366;
     outline-offset: 3px;
   }
 `

@@ -60,8 +60,13 @@ api.interceptors.response.use(
       error.message ||
       'Error de conexión con el servidor';
 
-    // Re-lanza el error con mensaje amigable para los hooks
-    return Promise.reject(new Error(message));
+    // Re-lanza el error enriquecido: mantiene mensaje amigable y suma
+    // status/data/response del HTTP original para uso futuro en callers.
+    const enriched = new Error(message);
+    enriched.status = error.response?.status;
+    enriched.data = error.response?.data;
+    enriched.response = error.response;
+    return Promise.reject(enriched);
   }
 );
 

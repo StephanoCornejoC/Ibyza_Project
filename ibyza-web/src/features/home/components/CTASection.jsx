@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Phone } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { ROUTES } from '@/shared/constants/routes'
 
 /**
@@ -17,19 +17,15 @@ const CTASection = () => (
       transition={{ duration: 0.6 }}
     >
       <Eyebrow>— Da el siguiente paso —</Eyebrow>
-      <Title>Tu mejor inversion te esta esperando</Title>
+      <Title>Tu mejor inversión te está esperando</Title>
       <Subtitle>
         Agenda una cita con nuestro equipo y conoce los departamentos disponibles.
       </Subtitle>
       <ButtonsRow>
-        <PrimaryBtn as={Link} to={ROUTES.CONTACT}>
-          Contactar asesor
+        <PrimaryBtn as={Link} to={`${ROUTES.CONTACT}?tab=appointment`}>
+          AGENDAR CITA
           <ArrowRight size={18} />
         </PrimaryBtn>
-        <SecondaryBtn href="tel:+51993674174">
-          <Phone size={16} />
-          Llamar ahora
-        </SecondaryBtn>
       </ButtonsRow>
     </Inner>
   </Section>

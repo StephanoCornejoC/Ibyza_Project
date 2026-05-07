@@ -13,6 +13,7 @@ import { formatPriceUSD, formatArea } from '@/shared/utils/formatters'
 import { buildProjectDetailRoute } from '@/shared/constants/routes'
 import useUIStore from '@/shared/stores/useUIStore'
 import useDepartamentosDisponibles from './hooks/useDepartamentosDisponibles'
+import heroBg from '@/assets/images/hero-about-pexels-1920w.webp'
 
 /**
  * SeparacionPage — Camino directo para separar un departamento.
@@ -51,7 +52,7 @@ const SeparacionPage = () => {
         <title>Separar Departamento | IBYZA</title>
         <meta
           name="description"
-          content="Separa tu departamento disponible en IBYZA con tarjeta de credito o transferencia bancaria. Proceso seguro y rapido."
+          content="Separa tu departamento disponible en IBYZA con tarjeta de crédito o transferencia bancaria. Proceso seguro y rápido."
         />
       </Helmet>
 
@@ -61,7 +62,7 @@ const SeparacionPage = () => {
           <SectionTitle
             eyebrow="Separa tu departamento"
             title="Invierte en tu futuro"
-            subtitle="Reserva el departamento de tus suenos con un deposito de separacion. Pago con tarjeta o transferencia bancaria."
+            subtitle="Reserva el departamento de tus sueños con un depósito de separación. Pago con tarjeta o transferencia bancaria."
             light
           />
           <HeroBadges
@@ -80,7 +81,7 @@ const SeparacionPage = () => {
             </HeroBadge>
             <HeroBadge>
               <ShieldCheck size={16} />
-              Transaccion segura
+              Transacción segura
             </HeroBadge>
           </HeroBadges>
         </HeroContent>
@@ -126,7 +127,7 @@ const SeparacionPage = () => {
         {!loading && !error && deptos.length === 0 && (
           <EmptyState
             title="Sin departamentos disponibles"
-            description="Todos nuestros proyectos estan vendidos o separados. Por favor contactanos para futuras oportunidades."
+            description="Todos nuestros proyectos están vendidos o separados. Por favor contáctanos para futuras oportunidades."
           />
         )}
 
@@ -209,8 +210,12 @@ const SeparacionPage = () => {
 
 const Hero = styled.section`
   position: relative;
-  min-height: 55vh;
-  background: linear-gradient(135deg, #0F233B 0%, #1a3a5c 50%, #0F233B 100%);
+  height: 100dvh;
+  min-height: 600px;
+  background-color: ${({ theme }) => theme.colors.deepBg};
+  background-image: url(${heroBg});
+  background-size: cover;
+  background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -221,12 +226,11 @@ const Hero = styled.section`
   ${({ theme }) => theme.media.tablet} {
     padding: ${({ theme }) => `${theme.spacing.xxxl} ${theme.spacing.md}`};
     padding-top: calc(70px + ${({ theme }) => theme.spacing.xl});
-    min-height: 50vh;
   }
 
   ${({ theme }) => theme.media.mobile} {
     padding-top: calc(64px + ${({ theme }) => theme.spacing.lg});
-    min-height: auto;
+    min-height: 100dvh;
   }
 `
 
@@ -234,6 +238,7 @@ const HeroOverlay = styled.div`
   position: absolute;
   inset: 0;
   background:
+    linear-gradient(135deg, rgba(15,35,59,0.82) 0%, rgba(15,35,59,0.72) 100%),
     radial-gradient(ellipse at 30% 30%, rgba(214,179,112,0.08) 0%, transparent 60%),
     radial-gradient(ellipse at 70% 70%, rgba(214,179,112,0.05) 0%, transparent 60%);
   pointer-events: none;

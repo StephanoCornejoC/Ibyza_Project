@@ -3,12 +3,12 @@ import styled from 'styled-components'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, Star, Users, Zap, Heart, Award, ChevronLeft, ChevronRight } from 'lucide-react'
 
-import valCompromiso from '@/assets/images/values-compromiso.png'
-import valIntegridad from '@/assets/images/values-integridad.png'
-import valInnovacion from '@/assets/images/values-innovacion.png'
-import valSostenibilidad from '@/assets/images/values-sostenibilidad.png'
-import valProfesionalismo from '@/assets/images/values-profesionalismo.png'
-import valCalidad from '@/assets/images/values-calidad.png'
+import valCompromiso from '@/assets/images/values-compromiso.webp'
+import valIntegridad from '@/assets/images/values-integridad.webp'
+import valInnovacion from '@/assets/images/values-innovacion.webp'
+import valSostenibilidad from '@/assets/images/values-sostenibilidad.webp'
+import valProfesionalismo from '@/assets/images/values-profesionalismo.webp'
+import valCalidad from '@/assets/images/values-calidad.webp'
 
 /**
  * ValuesCarousel — Carrusel de 6 valores con auto-play cada 4s.
@@ -18,19 +18,19 @@ const VALUES = [
   {
     icon: Shield,
     title: 'Compromiso',
-    description: 'Nos comprometemos con la satisfaccion total de nuestros clientes y el desarrollo de la comunidad.',
+    description: 'Nos comprometemos con la satisfacción total de nuestros clientes y el desarrollo de la comunidad.',
     image: valCompromiso,
   },
   {
     icon: Star,
     title: 'Integridad',
-    description: 'Construimos relaciones duraderas basadas en la transparencia y la honestidad en cada decision.',
+    description: 'Construimos relaciones duraderas basadas en la transparencia y la honestidad en cada decisión.',
     image: valIntegridad,
   },
   {
     icon: Zap,
-    title: 'Innovacion',
-    description: 'Incorporamos las ultimas tendencias en diseno arquitectonico y tecnologias constructivas.',
+    title: 'Innovación',
+    description: 'Incorporamos las últimas tendencias en diseño arquitectónico y tecnologías constructivas.',
     image: valInnovacion,
   },
   {
@@ -42,13 +42,13 @@ const VALUES = [
   {
     icon: Users,
     title: 'Profesionalismo',
-    description: 'Un equipo altamente calificado que acompana cada etapa del proceso de inversion.',
+    description: 'Un equipo altamente calificado que acompaña cada etapa del proceso de inversión.',
     image: valProfesionalismo,
   },
   {
     icon: Award,
     title: 'Calidad',
-    description: 'Cada proyecto es ejecutado con los mas altos estandares de construccion y acabados premium.',
+    description: 'Cada proyecto es ejecutado con los más altos estándares de construcción y acabados premium.',
     image: valCalidad,
   },
 ]
@@ -114,7 +114,7 @@ const ValuesCarousel = () => {
             <Eyebrow>— Nuestros Valores —</Eyebrow>
             <STitle>Lo que nos define</STitle>
             <GoldDivider />
-            <Subtitle>Los principios que guian cada decision que tomamos como empresa.</Subtitle>
+            <Subtitle>Los principios que guían cada decisión que tomamos como empresa.</Subtitle>
           </motion.div>
         </HeaderBlock>
 

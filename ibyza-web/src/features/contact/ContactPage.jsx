@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Calendar, MapPin, Phone, Mail, Clock } from 'lucide-react';
 import { SectionTitle } from '@/shared/components/ui/SectionTitle';
-import contactBg from '@/assets/images/bg-contact.png';
+import contactBg from '@/assets/images/bg-contact.webp';
 import ContactForm from './components/ContactForm';
 import AppointmentForm from './components/AppointmentForm';
 import useContact from './hooks/useContact';
@@ -15,7 +16,9 @@ import useConfiguracion from '@/shared/hooks/useConfiguracion';
  * ContactPage — Sin hero. Contenido directo con transiciones suaves entre tabs.
  */
 const ContactPage = () => {
-  const [activeTab, setActiveTab] = useState('contact');
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'contact' ? 'contact' : 'appointment';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const {
     loading, error,
     contactSuccess, appointmentSuccess,
@@ -35,8 +38,8 @@ const ContactPage = () => {
   }, [activeTab]);
 
   const contactInfo = [
-    { icon: MapPin, label: 'Direccion', value: config?.direccion || 'Puente Bolivar 205, Umacollo, Arequipa' },
-    { icon: Phone, label: 'Telefono', value: config?.telefono || '+51 993 674 174' },
+    { icon: MapPin, label: 'Dirección', value: config?.direccion || 'Puente Bolívar 205, Umacollo, Arequipa' },
+    { icon: Phone, label: 'Teléfono', value: config?.telefono || '+51 993 674 174' },
     { icon: Mail, label: 'Correo', value: config?.email || 'ventas@ibyzacorp.com' },
     { icon: Clock, label: 'Horario', value: config?.horario || 'Lun-Vie: 9:00 AM - 6:00 PM | Sab: 9:00 AM - 1:00 PM' },
   ];
@@ -53,7 +56,7 @@ const ContactPage = () => {
         <title>Contacto | IBYZA</title>
         <meta
           name="description"
-          content="Contactanos o agenda una visita a nuestros proyectos. Estamos para ayudarte."
+          content="Contáctanos o agenda una visita a nuestros proyectos. Estamos para ayudarte."
         />
       </Helmet>
 
@@ -63,9 +66,9 @@ const ContactPage = () => {
         {/* Titulo integrado sin hero */}
         <TitleArea>
           <SectionTitle
-            eyebrow="Estamos aqui"
-            title="Contactanos"
-            subtitle="Escribenos o agenda una visita. Un asesor especializado te atendera."
+            eyebrow="Estamos aquí"
+            title="Contáctanos"
+            subtitle="Escríbenos o agenda una visita. Un asesor especializado te atenderá."
             light
           />
         </TitleArea>
@@ -78,7 +81,7 @@ const ContactPage = () => {
             transition={{ duration: 0.5 }}
           >
             <InfoPanel>
-              <InfoTitle>Informacion de contacto</InfoTitle>
+              <InfoTitle>Información de contacto</InfoTitle>
               <GoldLine />
               <InfoList>
                 {contactInfo.map((item) => {
@@ -101,7 +104,7 @@ const ContactPage = () => {
                 const disponibles = (projects || []).filter(p => p.estado !== 'vendido');
                 return disponibles.length > 0 && (
                   <ProjectsPreview>
-                    <ProjectsTitle>— Proyectos de interes —</ProjectsTitle>
+                    <ProjectsTitle>— Proyectos de interés —</ProjectsTitle>
                     {disponibles.map((p) => (
                       <ProjectItem key={p.id}>{p.nombre} — {p.estado_display}</ProjectItem>
                     ))}
@@ -120,18 +123,18 @@ const ContactPage = () => {
             <FormPanel>
               <TabsRow>
                 <Tab
-                  $active={activeTab === 'contact'}
-                  onClick={() => setActiveTab('contact')}
-                >
-                  <MessageCircle size={16} />
-                  Enviar mensaje
-                </Tab>
-                <Tab
                   $active={activeTab === 'appointment'}
                   onClick={() => setActiveTab('appointment')}
                 >
                   <Calendar size={16} />
-                  Agendar visita
+                  AGENDAR CITA
+                </Tab>
+                <Tab
+                  $active={activeTab === 'contact'}
+                  onClick={() => setActiveTab('contact')}
+                >
+                  <MessageCircle size={16} />
+                  ENVIAR MENSAJE
                 </Tab>
               </TabsRow>
 
@@ -180,30 +183,33 @@ const ContactPage = () => {
           </motion.div>
         </ContentGrid>
 
-        {/* Mapa */}
-        <MapSection
-          as={motion.div}
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <MapTitle>
-            <MapPin size={18} />
-            Encuentranos
-          </MapTitle>
-          <MapContainer>
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.549!2d-71.5366!3d-16.3981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91424a5be3b2c3c5%3A0x1234567890abcdef!2sPuente+Bol%C3%ADvar+205%2C+Arequipa!5e0!3m2!1ses!2spe!4v1"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen=""
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Ubicacion de IBYZA"
-            />
-          </MapContainer>
-        </MapSection>
+        {/* Mapa — se oculta cuando estamos viendo el resumen post-cita
+            para no robar protagonismo a los datos de la cita */}
+        {!appointmentSuccess && (
+          <MapSection
+            as={motion.div}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <MapTitle>
+              <MapPin size={18} />
+              Encuéntranos
+            </MapTitle>
+            <MapContainer>
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3827.549!2d-71.5366!3d-16.3981!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91424a5be3b2c3c5%3A0x1234567890abcdef!2sPuente+Bol%C3%ADvar+205%2C+Arequipa!5e0!3m2!1ses!2spe!4v1"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Ubicación de IBYZA"
+              />
+            </MapContainer>
+          </MapSection>
+        )}
       </PageContent>
       </PageWrapper>
     </>
@@ -214,11 +220,25 @@ const PageWrapper = styled.div`
   position: relative;
   min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.deepBg};
-  background-image: url(${contactBg});
-  background-size: cover;
-  background-position: center top;
-  background-attachment: fixed;
   overflow: hidden;
+
+  /* La imagen vive en un pseudo-elemento de altura fija al top de la pagina,
+     no en el wrapper. Evita que la imagen "cambie de tamaño" cuando el form
+     crece al mostrar errores o mas campos. */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    background-image: url(${contactBg});
+    background-size: cover;
+    background-position: center top;
+    background-repeat: no-repeat;
+    z-index: 0;
+    pointer-events: none;
+  }
 `;
 
 const PageOverlay = styled.div`

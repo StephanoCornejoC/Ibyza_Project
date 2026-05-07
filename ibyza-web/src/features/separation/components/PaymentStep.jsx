@@ -38,7 +38,7 @@ const PaymentStep = ({
     window.Culqi.settings({
       title: 'IBYZA',
       currency: 'PEN',
-      description: `Separacion: ${department?.codigo || 'Departamento'}`,
+      description: `Separación: ${department?.codigo || 'Departamento'}`,
       amount: MONTO_CENTAVOS,
     });
 

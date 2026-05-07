@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { ROUTES } from '@/shared/constants/routes'
 import useUIStore from '@/shared/stores/useUIStore'
+import logoBlanco from '@/assets/brand/logo-blanco.png'
 
 /**
  * Navbar — Barra de navegación premium con:
@@ -67,6 +68,13 @@ export const Navbar = () => {
         <NavInner>
           {/* Logo con shimmer */}
           <LogoLink to={ROUTES.HOME} aria-label="IBYZA — Inicio" onClick={scrollToTop(ROUTES.HOME)}>
+            <LogoImg
+              src={logoBlanco}
+              alt="IBYZA"
+              loading="eager"
+              width="32"
+              height="32"
+            />
             <LogoText>IBYZA</LogoText>
           </LogoLink>
 
@@ -191,6 +199,20 @@ const NavInner = styled.div`
 const LogoLink = styled(Link)`
   text-decoration: none;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`
+
+const LogoImg = styled.img`
+  display: block;
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+
+  ${({ theme }) => theme.media.mobile} {
+    height: 28px;
+  }
 `
 
 const LogoText = styled.span`

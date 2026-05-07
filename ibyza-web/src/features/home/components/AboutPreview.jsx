@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { ShieldCheck, Lightbulb, Award, ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ROUTES } from '@/shared/constants/routes'
+import bgFallback from '@/assets/images/hero-projects.webp'
 
 /**
  * AboutPreview — Seccion "Quienes Somos" en Home.
@@ -12,19 +13,18 @@ import { ROUTES } from '@/shared/constants/routes'
  */
 const VALUES = [
   { icon: ShieldCheck, label: 'Compromiso' },
-  { icon: Lightbulb, label: 'Innovacion' },
+  { icon: Lightbulb, label: 'Innovación' },
   { icon: Award, label: 'Integridad' },
 ]
 
 const AboutPreview = ({ content }) => {
   const descripcion =
     content?.historia ||
-    'Somos una empresa de servicios generales que cuenta con profesionales altamente calificados y comprometidos con nuestros clientes a fin de lograr resultados optimos.'
-  const bgImage = content?.imagen_nosotros || null
+    'Somos una empresa de servicios generales que cuenta con profesionales altamente calificados y comprometidos con nuestros clientes a fin de lograr resultados óptimos.'
+  const bgImage = content?.imagen_nosotros || bgFallback
 
   return (
-    <Section id="about-section" $bgImage={bgImage}>
-      <BgOverlay />
+    <Section id="about-section">
       <ContentGrid>
         {/* Columna izquierda: texto */}
         <LeftColumn>
@@ -36,13 +36,13 @@ const AboutPreview = ({ content }) => {
           >
             <Eyebrow>— Nuestra Empresa —</Eyebrow>
             <Title>
-              <TitleLine>Quienes</TitleLine>
+              <TitleLine>¿Quiénes</TitleLine>
               <TitleLine>Somos?</TitleLine>
             </Title>
             <Divider />
             <Description>{descripcion}</Description>
             <PrimaryButton as={Link} to={ROUTES.ABOUT}>
-              Conocenos Mas
+              Conócenos Más
               <ArrowRight size={18} />
             </PrimaryButton>
           </motion.div>
@@ -80,19 +80,22 @@ const AboutPreview = ({ content }) => {
 const Section = styled.section`
   position: relative;
   padding: ${({ theme }) => `${theme.spacing.section} 0`};
-  background: ${({ theme }) => theme.colors.deepBg};
+  background-color: ${({ theme }) => theme.colors.deepBg};
+  background-size: cover;
+  background-position: center;
   min-height: 500px;
   display: flex;
   align-items: center;
   overflow: hidden;
+
+  /* En mobile/tablet, scroll normal (parallax fixed mata performance en touch). */
+  ${({ theme }) => theme.media.tablet} {
+    background-attachment: scroll;
+  }
 `
 
 const BgOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 30% 50%, rgba(214,179,112,0.03) 0%, transparent 60%);
-  z-index: 0;
-  pointer-events: none;
+  display: none;
 `
 
 const ContentGrid = styled.div`

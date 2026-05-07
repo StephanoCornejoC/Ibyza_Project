@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styled from 'styled-components';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { lockScroll, unlockScroll } from '@/shared/utils/scrollLock';
 
 /**
  * Modal — Componente base reutilizable con overlay glassmorphism premium. ADN inconsarq.
@@ -38,15 +39,14 @@ export const Modal = ({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Bloquear scroll del body mientras el modal está abierto
+  // Bloquear scroll del body mientras el modal está abierto.
+  // Usamos un contador global para soportar varios modales simultaneos
+  // sin que uno deje al body permanentemente bloqueado al desmontarse.
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    if (!isOpen) return undefined;
+    lockScroll();
     return () => {
-      document.body.style.overflow = '';
+      unlockScroll();
     };
   }, [isOpen]);
 
@@ -67,6 +67,7 @@ export const Modal = ({
           role="dialog"
           aria-modal="true"
           aria-label={title || 'Modal'}
+          data-lenis-prevent
         >
           <ModalContainer
             as={motion.div}

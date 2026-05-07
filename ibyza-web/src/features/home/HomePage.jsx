@@ -7,11 +7,10 @@ import CTASection from './components/CTASection';
 
 /**
  * HomePage — Pagina de inicio de IBYZA.
- * Secciones: Hero → Quienes Somos → Carrusel Proyectos → CTA Contacto.
+ * Secciones: Hero -> Carrusel Proyectos -> Quienes Somos -> CTA Contacto.
  */
 const HomePage = () => {
-  const { heroContent, aboutContent, allProjects, loading, error } =
-    useHomeContent();
+  const { heroContent, aboutContent, allProjects, loading } = useHomeContent();
 
   return (
     <>
@@ -26,11 +25,11 @@ const HomePage = () => {
       {/* Seccion 1: Hero con logo + slogan */}
       <HeroSection content={heroContent} />
 
-      {/* Seccion 2: Quienes Somos (preview) */}
-      <AboutPreview content={aboutContent} />
-
-      {/* Seccion 3: Carrusel de proyectos */}
+      {/* Seccion 2: Carrusel de proyectos */}
       <ProjectsCarousel projects={allProjects} loading={loading} />
+
+      {/* Seccion 3: Quienes Somos (preview) */}
+      <AboutPreview content={aboutContent} />
 
       {/* Seccion 4: CTA hacia contacto */}
       <CTASection />

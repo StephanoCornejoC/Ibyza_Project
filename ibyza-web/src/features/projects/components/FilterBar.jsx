@@ -9,7 +9,7 @@ import useProjectStore from '@/shared/stores/useProjectStore';
  */
 const ESTADOS = [
   { value: '', label: 'Todos' },
-  { value: 'en_venta', label: 'En venta' },
+  { value: 'en_venta', label: 'Disponible' },
   { value: 'preventa', label: 'Preventa' },
   { value: 'vendido', label: 'Vendido' },
 ];

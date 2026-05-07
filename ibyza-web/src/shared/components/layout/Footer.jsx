@@ -1,6 +1,20 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { MapPin, Phone, Mail, Share2, MessageSquare, Rss } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
+
+const FacebookIcon = (props) => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true" {...props}>
+    <path d="M22 12.07C22 6.48 17.52 2 11.93 2 6.34 2 1.86 6.48 1.86 12.07c0 5.05 3.7 9.24 8.54 9.95v-7.04H7.86v-2.91h2.54V9.84c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.91h-2.34v7.04c4.84-.71 8.54-4.9 8.54-9.95z"/>
+  </svg>
+);
+
+const InstagramIcon = (props) => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+  </svg>
+);
 import { ROUTES } from '@/shared/constants/routes';
 import useConfiguracion from '@/shared/hooks/useConfiguracion';
 
@@ -11,7 +25,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
   const { config } = useConfiguracion();
 
-  const direccion = config?.direccion || 'Puente Bolivar 205, Umacollo, Arequipa';
+  const direccion = config?.direccion || 'Puente Bolívar 205, Umacollo, Arequipa';
   const telefono = config?.telefono || '+51 993 674 174';
   const email = config?.email || 'ventas@ibyzacorp.com';
   const facebookUrl = config?.facebook_url || 'https://www.facebook.com/profile.php?id=61580984001744';
@@ -30,18 +44,16 @@ export const Footer = () => {
           </BrandTagline>
           <SocialLinks>
             <SocialLink href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-              <MessageSquare size={16} />
+              <FacebookIcon />
             </SocialLink>
-            {config?.instagram_url && (
-              <SocialLink href={config.instagram_url} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                <Share2 size={16} />
-              </SocialLink>
-            )}
-            {config?.tiktok_url && (
-              <SocialLink href={config.tiktok_url} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-                <Rss size={16} />
-              </SocialLink>
-            )}
+            <SocialLink href={config?.instagram_url || '#'} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+              <InstagramIcon />
+            </SocialLink>
+            <SocialLink href={config?.tiktok_url || '#'} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43V8.34a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.83 4.83 0 0 1-1.84-.26z"/>
+              </svg>
+            </SocialLink>
           </SocialLinks>
         </FooterBrand>
 
@@ -72,7 +84,13 @@ export const Footer = () => {
           <ContactList>
             <ContactItem>
               <MapPin size={15} />
-              <span>{direccion}</span>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {direccion}
+              </a>
             </ContactItem>
             <ContactItem>
               <Phone size={15} />

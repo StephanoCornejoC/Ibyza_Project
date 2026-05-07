@@ -16,6 +16,62 @@ import { Spinner } from '@/shared/components/ui/Spinner';
 import { SectionTitle } from '@/shared/components/ui/SectionTitle';
 
 /**
+ * VideoEmbed — Wrapper para iframes de YouTube que evita que el iframe
+ * intercepte el wheel del navegador. Por defecto el iframe queda con
+ * pointer-events: none (no recibe input). Cuando el usuario clickea el
+ * play overlay, activamos pointer-events: auto y autoplay del video.
+ *
+ * Tambien marca el contenedor con data-lenis-prevent una vez activo, para
+ * que Lenis NO reinterprete el wheel del cursor sobre el iframe (deja que
+ * YouTube lo maneje en pantalla completa, por ejemplo).
+ */
+// eslint-disable-next-line react/prop-types
+const VideoEmbed = ({ video }) => {
+  const [active, setActive] = useState(false);
+  const baseSrc = video.youtube_url
+    .replace('watch?v=', 'embed/')
+    .replace('youtu.be/', 'youtube.com/embed/');
+  const activeSrc = baseSrc.includes('?')
+    ? `${baseSrc}&autoplay=1`
+    : `${baseSrc}?autoplay=1`;
+  const thumbMatch = baseSrc.match(/embed\/([^?&/]+)/);
+  const thumbId = thumbMatch ? thumbMatch[1] : null;
+
+  return (
+    <VideoWrapper data-lenis-prevent={active ? 'true' : undefined}>
+      <iframe
+        src={active ? activeSrc : baseSrc}
+        title={video.titulo || 'Video del proyecto'}
+        width="100%"
+        height="100%"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        style={{ pointerEvents: active ? 'auto' : 'none' }}
+      />
+      {!active && (
+        <PlayOverlay
+          type="button"
+          onClick={() => setActive(true)}
+          aria-label={video.titulo ? `Reproducir ${video.titulo}` : 'Reproducir video'}
+        >
+          {thumbId && (
+            <PlayThumb
+              src={`https://img.youtube.com/vi/${thumbId}/hqdefault.jpg`}
+              alt=""
+              loading="lazy"
+            />
+          )}
+          <PlayIconCircle>
+            <Play size={28} fill="currentColor" />
+          </PlayIconCircle>
+        </PlayOverlay>
+      )}
+    </VideoWrapper>
+  );
+};
+
+/**
  * ProjectDetailPage — Página de detalle de un proyecto. ADN inconsarq.
  */
 const ProjectDetailPage = () => {
@@ -25,9 +81,15 @@ const ProjectDetailPage = () => {
   const [detailModalDept, setDetailModalDept] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
-  // Scroll to top al entrar al detalle del proyecto
+  // Scroll to top al entrar al detalle del proyecto.
+  // Si Lenis esta activo, hay que usar su API o el reset visual no aplica
+  // (Lenis maneja su propio offset interno).
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    const lenis = typeof window !== 'undefined' ? window.__lenis : null;
+    if (lenis && typeof lenis.scrollTo === 'function') {
+      lenis.scrollTo(0, { immediate: true, force: true });
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [slug]);
 
   const openDetailModal = (dept) => {
@@ -57,7 +119,16 @@ const ProjectDetailPage = () => {
       </Helmet>
 
       {/* Botón volver */}
-      <BackLink to={ROUTES.PROJECTS} onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+      <BackLink
+        to={ROUTES.PROJECTS}
+        onClick={() => {
+          const lenis = typeof window !== 'undefined' ? window.__lenis : null;
+          if (lenis && typeof lenis.scrollTo === 'function') {
+            lenis.scrollTo(0, { immediate: true, force: true });
+          }
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+        }}
+      >
         <ArrowLeft size={18} />
         Volver a Proyectos
       </BackLink>
@@ -123,36 +194,28 @@ const ProjectDetailPage = () => {
           </InfoMain>
         </ProjectInfoSection>
 
-        {/* Videos de YouTube */}
-        {project.videos && project.videos.length > 0 && (
-          <VideosSection>
-            <SectionTitle title="Videos" align="left" eyebrow="Recorrido virtual" />
-            <VideosGrid>
-              {project.videos.map((video) => (
-                <VideoWrapper key={video.id || video.youtube_url}>
-                  <iframe
-                    src={video.youtube_url
-                      .replace('watch?v=', 'embed/')
-                      .replace('youtu.be/', 'youtube.com/embed/')}
-                    title={video.titulo || 'Video del proyecto'}
-                    width="100%"
-                    height="100%"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </VideoWrapper>
-              ))}
-            </VideosGrid>
-          </VideosSection>
-        )}
+        {/* Videos + Galería: lado a lado en desktop, apilados en mobile */}
+        {((project.videos && project.videos.length > 0) ||
+          (project.galeria && project.galeria.length > 0)) && (
+          <MediaSplit>
+            {project.videos && project.videos.length > 0 && (
+              <VideosSection>
+                <SectionTitle title="Videos" align="left" eyebrow="Recorrido virtual" />
+                <VideosGrid>
+                  {project.videos.map((video) => (
+                    <VideoEmbed key={video.id || video.youtube_url} video={video} />
+                  ))}
+                </VideosGrid>
+              </VideosSection>
+            )}
 
-        {/* Galería */}
-        {project.galeria && project.galeria.length > 0 && (
-          <GallerySection>
-            <SectionTitle title="Galeria" align="left" eyebrow="Imagenes" />
-            <ProjectGallery images={project.galeria} />
-          </GallerySection>
+            {project.galeria && project.galeria.length > 0 && (
+              <GallerySection>
+                <SectionTitle title="Galería" align="left" eyebrow="Imágenes" />
+                <ProjectGallery images={project.galeria} />
+              </GallerySection>
+            )}
+          </MediaSplit>
         )}
 
         {/* Vista interactiva de niveles y departamentos */}
@@ -160,7 +223,7 @@ const ProjectDetailPage = () => {
           <FloorPlanSection>
             <SectionTitle
               title="Niveles y departamentos"
-              eyebrow="Distribucion"
+              eyebrow="Distribución"
               align="left"
               subtitle="Explora cada nivel y selecciona un departamento para ver su detalle."
             />
@@ -171,7 +234,7 @@ const ProjectDetailPage = () => {
         {/* Plano spotlight (fallback si hay plano_url pero no niveles) */}
         {project.plano_url && (!project.niveles || project.niveles.length === 0) && (
           <FloorPlanSection>
-            <SectionTitle title="Plano del nivel" align="left" eyebrow="Distribucion" />
+            <SectionTitle title="Plano del nivel" align="left" eyebrow="Distribución" />
             <FloorPlanSpotlight src={project.plano_url} alt={`Plano ${project.nombre}`} />
           </FloorPlanSection>
         )}
@@ -433,19 +496,26 @@ const CatalogButton = styled.a`
   }
 `;
 
+const MediaSplit = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: ${({ theme }) => theme.spacing.xxl};
+  align-items: start;
+
+  ${({ theme }) => theme.media?.minTablet} {
+    grid-template-columns: 1fr 1fr;
+    gap: ${({ theme }) => theme.spacing.xl};
+  }
+`;
+
 const VideosSection = styled.div`
-  margin-top: ${({ theme }) => theme.spacing.section};
+  min-width: 0;
 `;
 
 const VideosGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
-  gap: ${({ theme }) => theme.spacing.lg};
-
-  ${({ theme }) => theme.media?.tablet} {
-    grid-template-columns: 1fr;
-    gap: ${({ theme }) => theme.spacing.md};
-  }
+  grid-template-columns: 1fr;
+  gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const VideoWrapper = styled.div`
@@ -463,6 +533,55 @@ const VideoWrapper = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
+  }
+`;
+
+const PlayThumb = styled.img`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.75);
+`;
+
+const PlayIconCircle = styled.div`
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.gradients?.gold || '#D6B370'};
+  color: ${({ theme }) => theme.colors?.deepBg || '#08131f'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 28px rgba(214,179,112,0.45);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  pointer-events: none;
+`;
+
+const PlayOverlay = styled.button`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover ${PlayIconCircle} {
+    transform: scale(1.08);
+    box-shadow: 0 12px 36px rgba(214,179,112,0.55);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.gold};
+    outline-offset: -4px;
   }
 `;
 
@@ -492,7 +611,7 @@ const BackLink = styled(Link)`
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
   padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
-  margin: ${({ theme }) => `${theme.spacing.lg} ${theme.spacing.lg} 0`};
+  margin: ${({ theme }) => `calc(64px + ${theme.spacing.md}) ${theme.spacing.lg} 0`};
   color: ${({ theme }) => theme.colors.gold};
   font-family: ${({ theme }) => theme.fonts.body};
   font-size: ${({ theme }) => theme.fontSizes.sm};
@@ -509,7 +628,7 @@ const BackLink = styled(Link)`
   }
 
   ${({ theme }) => theme.media.mobile} {
-    margin: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.md} 0`};
+    margin: ${({ theme }) => `calc(64px + ${theme.spacing.md}) ${theme.spacing.md} 0`};
     letter-spacing: 1.5px;
     padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
   }

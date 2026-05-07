@@ -57,7 +57,7 @@ const FeaturedProjects = ({ projects, loading, error }) => {
     <Section id="featured-projects">
       <SectionTitle
         eyebrow="Nuestros proyectos"
-        title="Descubre donde vivir"
+        title="Descubre dónde vivir"
         subtitle="Departamentos diseñados para el estilo de vida que buscas."
       />
 

@@ -8,11 +8,11 @@ import { staggerContainer, fadeInUp } from '@/shared/utils/animations'
  * Stats integrados dentro del hero (sin seccion vacia debajo).
  * Imagen de fondo dinamica desde CMS.
  */
-import heroFallback from '@/assets/images/hero-about-pexels.jpg'
+import heroFallback from '@/assets/images/hero-about-pexels.webp'
 const HERO_FALLBACK = heroFallback
 
 const AboutHero = ({ content }) => {
-  const titulo = content?.titulo || 'Quienes somos'
+  const titulo = content?.titulo || 'Quiénes somos'
   const subtitulo =
     content?.subtitulo ||
     'Una empresa comprometida con la calidad, la transparencia y el bienestar de nuestros clientes.'
@@ -22,8 +22,8 @@ const AboutHero = ({ content }) => {
 
   // Stats editables desde Django CMS (seccion: nosotros, claves: stat_anos, stat_vendidas, etc.)
   const stats = [
-    { value: parseInt(content?.stat_anos) || 6, suffix: '+', label: 'Anos en el mercado' },
-    { value: parseInt(content?.stat_vendidas) || 195, suffix: '+', label: 'Propiedades vendidas' },
+    { value: parseInt(content?.stat_anos) || 6, suffix: '+', label: 'Años en el mercado' },
+    { value: parseInt(content?.stat_vendidas) || 195, suffix: '', label: 'Departamentos vendidos' },
     { value: parseInt(content?.stat_proyectos) || 6, suffix: '', label: 'Proyectos desarrollados' },
     { value: parseInt(content?.stat_entregadas) || 50, suffix: '+', label: 'Propiedades entregadas' },
   ]
@@ -191,7 +191,8 @@ const TitleWrapper = styled.h1`
   font-size: ${({ theme }) => theme.fontSizes['5xl']};
   font-weight: 900;
   letter-spacing: -3px;
-  line-height: 1;
+  line-height: 1.18;
+  padding: 0.15em 0;
   color: ${({ theme }) => theme.colors.white};
   margin-bottom: 0;
   display: flex;
@@ -212,6 +213,7 @@ const TitleWrapper = styled.h1`
 const WordOuter = styled.span`
   overflow: hidden;
   display: inline-flex;
+  padding: 0.12em 0;
 `
 
 const HeroDivider = styled.div`

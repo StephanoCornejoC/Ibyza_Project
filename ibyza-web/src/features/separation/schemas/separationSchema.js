@@ -27,7 +27,7 @@ export const separationSchema = z.object({
 
   dni: z
     .string()
-    .regex(/^\d{8}$/, 'El DNI debe tener exactamente 8 digitos numericos'),
+    .regex(/^\d{8}$/, 'El DNI debe tener exactamente 8 dígitos numéricos'),
 
   // El monto se define automáticamente desde el departamento
   // pero se incluye para validación de consistencia

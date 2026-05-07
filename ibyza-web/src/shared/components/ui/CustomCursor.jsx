@@ -20,6 +20,8 @@ const CustomCursor = () => {
   useEffect(() => {
     // Solo activar en desktop (pointer: fine)
     if (!window.matchMedia('(pointer: fine)').matches) return
+    // Respetar prefers-reduced-motion: el cursor nativo ya es claro.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const onMouseMove = (e) => {
       mouse.current = { x: e.clientX, y: e.clientY }

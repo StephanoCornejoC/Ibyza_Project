@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import styled, { keyframes } from 'styled-components'
-import sectionBg from '@/assets/images/bg-mision-pexels.jpg'
+import sectionBg from '@/assets/images/hero-projects.webp'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Target, Eye, Award } from 'lucide-react'
 
@@ -13,15 +13,15 @@ const ITEMS = [
   {
     icon: Target,
     number: '01',
-    label: 'Nuestra Mision',
+    label: 'Nuestra Misión',
     fallback:
-      'Desarrollar proyectos inmobiliarios en areas consolidadas de Arequipa, generando mayor valor para nuestros clientes a traves de ubicaciones estrategicas, diseno funcional y acabados de calidad.',
+      'Desarrollar proyectos inmobiliarios en áreas consolidadas de Arequipa, generando mayor valor para nuestros clientes a través de ubicaciones estratégicas, diseño funcional y acabados de calidad.',
     cmsKey: 'mision',
   },
   {
     icon: Eye,
     number: '02',
-    label: 'Nuestra Vision',
+    label: 'Nuestra Visión',
     fallback:
       'Ser el referente local en desarrollo inmobiliario sostenible, reconocidos por la calidad de nuestros proyectos y el valor que generamos para inversionistas y familias.',
     cmsKey: 'vision',
@@ -31,7 +31,7 @@ const ITEMS = [
     number: '03',
     label: 'Nuestro Compromiso',
     fallback:
-      'Dedicamos especial atencion a escuchar a nuestros clientes y mejorar continuamente. Cada proyecto es construido con los mas altos estandares, garantizando que tu inversion sea segura.',
+      'Dedicamos especial atención a escuchar a nuestros clientes y mejorar continuamente. Cada proyecto es construido con los más altos estándares, garantizando que tu inversión sea segura.',
     cmsKey: 'propuesta_valor',
   },
 ]
@@ -47,8 +47,8 @@ const MisionVisionCards = ({ content }) => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <Eyebrow>— Nuestro Proposito —</Eyebrow>
-            <Title>Construimos con proposito</Title>
+            <Eyebrow>— Nuestro Propósito —</Eyebrow>
+            <Title>Construimos con propósito</Title>
             <GoldDivider />
           </motion.div>
         </HeaderBlock>
@@ -71,6 +71,16 @@ const MisionVisionCards = ({ content }) => {
 const FlipCard = ({ item, text, index }) => {
   const [flipped, setFlipped] = useState(false)
   const Icon = item.icon
+  const isCoarsePointer =
+    typeof window !== 'undefined' &&
+    window.matchMedia?.('(pointer: coarse)').matches
+
+  const interactionProps = isCoarsePointer
+    ? { onClick: () => setFlipped((prev) => !prev) }
+    : {
+        onMouseEnter: () => setFlipped(true),
+        onMouseLeave: () => setFlipped(false),
+      }
 
   return (
     <motion.div
@@ -79,11 +89,7 @@ const FlipCard = ({ item, text, index }) => {
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.12 }}
     >
-      <CardContainer
-        onMouseEnter={() => setFlipped(true)}
-        onMouseLeave={() => setFlipped(false)}
-        onClick={() => setFlipped(!flipped)}
-      >
+      <CardContainer {...interactionProps}>
         <CardInner $flipped={flipped}>
           {/* Front */}
           <CardFront>
