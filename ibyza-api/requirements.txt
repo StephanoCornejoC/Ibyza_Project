@@ -29,3 +29,7 @@ requests>=2.31.0
 
 # Email transaccional (3000/mes gratis, alta deliverability)
 resend>=2.0.0
+
+# Storage en Cloudflare R2 (S3-compatible) para media files
+django-storages[s3]>=1.14.4
+boto3>=1.35.0

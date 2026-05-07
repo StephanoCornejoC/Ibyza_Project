@@ -40,14 +40,6 @@ class DepartamentoDisponibleSerializer(serializers.ModelSerializer):
             'imagen_fachada': fachada,
             'estado': p.estado,
             'estado_display': p.get_estado_display(),
-            # Datos bancarios necesarios para el modal de pago
-            'empresa_receptora': p.empresa_receptora,
-            'empresa_ruc': p.empresa_ruc,
-            'empresa_banco': p.empresa_banco,
-            'cuenta_soles': p.cuenta_soles,
-            'cci_soles': p.cci_soles,
-            'cuenta_dolares': p.cuenta_dolares,
-            'cci_dolares': p.cci_dolares,
         }
 
 
@@ -98,6 +90,18 @@ class ProyectoDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre', 'slug', 'descripcion', 'descripcion_corta', 'ubicacion',
                   'google_maps_embed', 'imagen_fachada', 'imagen_isometrico', 'catalogo_pdf',
                   'estado', 'estado_display', 'precio_desde',
-                  'empresa_receptora', 'empresa_ruc', 'empresa_banco',
-                  'cuenta_soles', 'cci_soles', 'cuenta_dolares', 'cci_dolares',
                   'niveles', 'avances', 'videos', 'galeria']
+
+
+class DatosBancariosSerializer(serializers.ModelSerializer):
+    """Datos bancarios de la empresa receptora del proyecto.
+
+    NUNCA exponer este serializer en endpoints abiertos (listado, detalle).
+    Solo se entrega tras un POST con datos del comprador (nombre, email)
+    al endpoint /api/proyectos/<slug>/datos-bancarios/, con throttle agresivo.
+    """
+
+    class Meta:
+        model = Proyecto
+        fields = ['empresa_receptora', 'empresa_ruc', 'empresa_banco',
+                  'cuenta_soles', 'cci_soles', 'cuenta_dolares', 'cci_dolares']

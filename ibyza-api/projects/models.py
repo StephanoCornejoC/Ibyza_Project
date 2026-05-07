@@ -49,6 +49,7 @@ class Proyecto(models.Model):
     estado = models.CharField(
         'Estado del proyecto', max_length=20, choices=ESTADO_CHOICES, default='en_venta',
         help_text='Determina la etiqueta de color que se muestra en el sitio.',
+        db_index=True,
     )
     precio_desde = models.DecimalField(
         'Precio desde (S/)', max_digits=12, decimal_places=2, default=0,
@@ -57,10 +58,12 @@ class Proyecto(models.Model):
     orden = models.PositiveIntegerField(
         'Orden de aparición', default=0,
         help_text='Los proyectos con menor número aparecen primero en el sitio.',
+        db_index=True,
     )
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
         help_text='Desmarca para ocultar el proyecto de la web sin eliminarlo.',
+        db_index=True,
     )
 
     # Datos bancarios para transferencia (cada proyecto puede tener empresa receptora diferente)
@@ -163,6 +166,7 @@ class Departamento(models.Model):
     estado = models.CharField(
         'Estado de venta', max_length=20, choices=ESTADO_CHOICES, default='disponible',
         help_text='Cuando un cliente separa un depto, este estado cambia automáticamente.',
+        db_index=True,
     )
     descripcion = models.TextField(
         'Descripción (opcional)', blank=True,

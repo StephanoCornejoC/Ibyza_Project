@@ -1,11 +1,41 @@
 venv/
 .env
+.env.*
+!.env.example
 *.pyc
 __pycache__/
 db.sqlite3
+db.sqlite3-journal
 media/
 staticfiles/
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Node (no deberian existir en backend, pero por las dudas)
+node_modules/
+package.json
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Dumps y exports puntuales
+data_export.json
+*.dump
+*.sql
+
+# Logs y temporales
+*.log
+*.tmp
+.tmp/
+.cache/
+
+# Coverage / testing
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.mypy_cache/
+.ruff_cache/

@@ -12,6 +12,7 @@ class ContenidoWeb(models.Model):
     seccion = models.CharField(
         'Sección de la web', max_length=50, choices=SECCION_CHOICES,
         help_text='En qué parte del sitio aparece este texto.',
+        db_index=True,
     )
     clave = models.CharField(
         'Identificador interno', max_length=100,
@@ -28,6 +29,7 @@ class ContenidoWeb(models.Model):
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
         help_text='Desmarca para ocultar este contenido sin borrarlo.',
+        db_index=True,
     )
 
     class Meta:
@@ -92,6 +94,70 @@ class ConfiguracionSitio(models.Model):
         help_text='Aparece en metadatos SEO y en algunas secciones del sitio.',
     )
 
+    # === Sección "Origen del nombre" — al final del Home (deuda técnica Sprint 1) ===
+    origen_nombre_texto = models.TextField(
+        'Texto sobre el origen del nombre IBYZA',
+        blank=True,
+        default='El nombre IBYZA surge de la unión de los apellidos Ibáñez y Zavala, fundadores de la empresa.',
+        help_text='Aparece al final de la página de inicio. Edítalo cuando quieras.',
+    )
+
+    # === Modal de bienvenida — Sprint 2 ===
+    modal_activo = models.BooleanField(
+        'Modal de bienvenida activo',
+        default=False,
+        help_text='Marca esto para mostrar un modal cuando el visitante entra al sitio (una vez por sesión).',
+    )
+    modal_titulo = models.CharField(
+        'Título del modal', max_length=200, blank=True,
+        default='Conoce nuestro nuevo proyecto',
+    )
+    modal_subtitulo = models.TextField(
+        'Subtítulo del modal', blank=True,
+        default='Departamentos disponibles con la mejor ubicación de Arequipa.',
+    )
+    modal_imagen = models.ImageField(
+        'Imagen del modal',
+        upload_to='modal/', blank=True, null=True,
+        help_text='Imagen destacada del modal. Recomendado: 1200×800 px, máximo 500 KB.',
+    )
+    modal_proyecto = models.ForeignKey(
+        'projects.Proyecto', on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='+',
+        verbose_name='Proyecto destacado en modal',
+        help_text='Si seleccionas un proyecto, el botón del modal lleva a su página.',
+    )
+    modal_cta_texto = models.CharField(
+        'Texto del botón del modal',
+        max_length=100, blank=True, default='Ver proyecto',
+    )
+    modal_cta_es_whatsapp = models.BooleanField(
+        'El botón abre WhatsApp en lugar del proyecto',
+        default=False,
+        help_text='Si lo activas, el botón del modal abre WhatsApp con un mensaje pre-armado.',
+    )
+
+    # === Confirmación de citas — Sprint 2 ===
+    meet_link_permanente = models.URLField(
+        'Link permanente de Google Meet',
+        blank=True,
+        help_text='Pega aquí un link de Meet permanente (ej: meet.google.com/abc-defg-hij). Se incluirá en la confirmación de citas virtuales.',
+    )
+
+    # === Politicas de Privacidad ===
+    politicas_privacidad_html = models.TextField(
+        'Texto de Politicas de Privacidad (HTML)',
+        blank=True,
+        default=(
+            '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+            'Donec euismod, nibh ac vulputate efficitur, urna nulla finibus odio.</p>'
+            '<p>Pellentesque habitant morbi tristique senectus et netus et malesuada '
+            'fames ac turpis egestas.</p>'
+        ),
+        help_text='Soporta HTML basico (p, ul, li, strong, br). Aparece en el modal de "Acepto las politicas de privacidad" del formulario de cita.',
+    )
+
     class Meta:
         verbose_name = 'Configuración general del sitio'
         verbose_name_plural = 'Configuración general del sitio'
@@ -120,10 +186,12 @@ class PreguntaFrecuente(models.Model):
     orden = models.PositiveIntegerField(
         'Orden', default=0,
         help_text='Menor número aparece primero en la sección de FAQ.',
+        db_index=True,
     )
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
         help_text='Desmarca para ocultar esta pregunta sin borrarla.',
+        db_index=True,
     )
 
     class Meta:
@@ -163,10 +231,12 @@ class Testimonio(models.Model):
     orden = models.PositiveIntegerField(
         'Orden', default=0,
         help_text='Menor número aparece primero.',
+        db_index=True,
     )
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
         help_text='Desmarca para ocultar este testimonio sin borrarlo.',
+        db_index=True,
     )
 
     class Meta:
@@ -194,10 +264,12 @@ class Beneficio(models.Model):
     orden = models.PositiveIntegerField(
         'Orden', default=0,
         help_text='Menor número aparece primero.',
+        db_index=True,
     )
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
         help_text='Desmarca para ocultar este beneficio sin borrarlo.',
+        db_index=True,
     )
 
     class Meta:

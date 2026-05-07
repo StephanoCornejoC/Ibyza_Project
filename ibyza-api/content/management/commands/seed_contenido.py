@@ -48,7 +48,6 @@ CONTENIDOS = [
         'clave': 'historia',
         'valor': (
             'IBYZA nace en 2020 con nuestro primer proyecto inmobiliario. '
-            'El nombre surge de la unión de los apellidos Ibáñez y Zavala. '
             'Desde el inicio, hemos dedicado especial atención a escuchar a '
             'nuestros clientes y mejorar continuamente, consolidándonos como '
             'una empresa de confianza en el sector inmobiliario de Arequipa.'

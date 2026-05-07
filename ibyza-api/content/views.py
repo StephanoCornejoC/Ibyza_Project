@@ -1,6 +1,8 @@
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from .models import ContenidoWeb, ConfiguracionSitio, PreguntaFrecuente, Testimonio, Beneficio
 from .serializers import (
     ContenidoWebSerializer,
@@ -23,6 +25,7 @@ class ContenidoWebView(generics.ListAPIView):
         return qs
 
 
+@method_decorator(cache_page(300), name='dispatch')
 class ConfiguracionSitioView(APIView):
     """GET /api/configuracion/ — Devuelve la configuración global del sitio."""
     def get(self, request):
@@ -31,6 +34,7 @@ class ConfiguracionSitioView(APIView):
         return Response(serializer.data)
 
 
+@method_decorator(cache_page(600), name='dispatch')
 class PreguntasFrecuentesView(generics.ListAPIView):
     """GET /api/faq/ — Lista de preguntas frecuentes publicadas."""
     serializer_class = PreguntaFrecuenteSerializer
@@ -38,6 +42,7 @@ class PreguntasFrecuentesView(generics.ListAPIView):
     pagination_class = None
 
 
+@method_decorator(cache_page(600), name='dispatch')
 class TestimoniosView(generics.ListAPIView):
     """GET /api/testimonios/ — Lista de testimonios publicados."""
     serializer_class = TestimonioSerializer
@@ -45,6 +50,7 @@ class TestimoniosView(generics.ListAPIView):
     pagination_class = None
 
 
+@method_decorator(cache_page(600), name='dispatch')
 class BeneficiosView(generics.ListAPIView):
     """GET /api/beneficios/ — Lista de beneficios publicados."""
     serializer_class = BeneficioSerializer

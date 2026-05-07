@@ -10,8 +10,12 @@ from content.views import (
     BeneficiosView,
 )
 from projects.views import DepartamentosDisponiblesView
+from .views import healthz
 
 urlpatterns = [
+    # Healthcheck barato para Railway (no toca DB)
+    path('healthz/', healthz, name='healthz'),
+
     # Raiz redirige al admin
     path('', RedirectView.as_view(url='/admin/', permanent=False), name='root-redirect'),
 

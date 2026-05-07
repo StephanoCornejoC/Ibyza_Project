@@ -69,14 +69,23 @@ def _render_email_html(titulo, subtitulo, filas):
 </html>'''
 
 
-def send_notification(subject, html_body, text_body=None):
+def send_notification(subject, html_body, text_body=None, recipients=None, attachments=None):
     """
-    Envia un email transaccional a settings.EMAIL_RECIPIENTS.
+    Envia un email transaccional.
+
+    Args:
+        subject: asunto del email
+        html_body: cuerpo HTML
+        text_body: cuerpo en texto plano (opcional)
+        recipients: lista de destinatarios (opcional). Si es None, usa settings.EMAIL_RECIPIENTS.
+        attachments: lista opcional de adjuntos en formato Resend:
+            [{'filename': str, 'content': base64_str, 'content_type': str (opcional)}]
 
     Returns:
         dict con {'ok': bool, 'provider': 'resend'|'console'|'none', 'id': str|None, 'error': str|None}
     """
-    recipients = settings.EMAIL_RECIPIENTS
+    if recipients is None:
+        recipients = settings.EMAIL_RECIPIENTS
     if not recipients:
         logger.warning('EMAIL_RECIPIENTS vacio — skipping')
         return {'ok': False, 'provider': 'none', 'id': None, 'error': 'sin destinatarios'}
@@ -97,6 +106,8 @@ def send_notification(subject, html_body, text_body=None):
             }
             if text_body:
                 params['text'] = text_body
+            if attachments:
+                params['attachments'] = attachments
             result = resend.Emails.send(params)
             email_id = result.get('id') if isinstance(result, dict) else None
             logger.info('Resend OK - id=%s to=%s', email_id, ', '.join(recipients))
@@ -111,6 +122,8 @@ def send_notification(subject, html_body, text_body=None):
         print(f'[DEV EMAIL] De: {from_email}')
         print(f'[DEV EMAIL] Para: {", ".join(recipients)}')
         print(f'[DEV EMAIL] Asunto: {subject}')
+        if attachments:
+            print(f'[DEV EMAIL] Adjuntos: {[a.get("filename") for a in attachments]}')
         print('─' * 60)
         if text_body:
             print(text_body)

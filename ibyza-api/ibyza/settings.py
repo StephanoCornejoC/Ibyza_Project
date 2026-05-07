@@ -49,6 +49,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # ETag automático en respuestas GET → permite 304 Not Modified si el
+    # cliente manda If-None-Match. Complementario a cache_page (que cachea en server).
+    'django.middleware.http.ConditionalGetMiddleware',
 ]
 
 ROOT_URLCONF = 'ibyza.urls'
@@ -87,6 +90,38 @@ else:
         }
     }
 
+# ─── Cache ────────────────────────────────────────────────────────────────────
+# DatabaseCache: compartido entre workers de gunicorn via tabla en la misma DB.
+# Sin Redis = sin costo extra en Railway. TTL corto + tabla pequeña por defecto.
+#
+# En modo test (manage.py test) usamos LocMemCache: rapido, in-memory, aislado por
+# proceso. Esto evita acumulacion de contadores de DRF AnonRateThrottle entre
+# tests (ver tests/test_security.py — 100/min sobre /api/contacto/).
+import sys
+_IS_TEST = 'test' in sys.argv
+
+if _IS_TEST:
+    # DummyCache: no-op. Evita que cache_page cachee respuestas entre tests
+    # y que DRF AnonRateThrottle acumule contadores 429 cross-test.
+    # Tests que prueben caching/throttle especifico usan @override_settings.
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        },
+    }
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache_table',
+            'TIMEOUT': 300,  # 5 min default
+            'OPTIONS': {
+                'MAX_ENTRIES': 1000,
+                'CULL_FREQUENCY': 3,
+            },
+        },
+    }
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -100,19 +135,64 @@ USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Subida de archivos: comprobantes de transferencia pueden pesar hasta ~10 MB.
+# Default Django (2.5 MB) los rechaza con 400 antes de llegar a la vista.
+DATA_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024  # 12 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 12 * 1024 * 1024
+
 # ─── Archivos estáticos y media ───────────────────────────────────────────────
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# === Media storage ===
+# Por defecto: filesystem local (dev). Si hay credenciales R2 → Cloudflare R2.
+# R2 es S3-compatible: usamos django-storages + boto3.
+R2_ACCESS_KEY_ID = os.getenv('R2_ACCESS_KEY_ID', '')
+R2_SECRET_ACCESS_KEY = os.getenv('R2_SECRET_ACCESS_KEY', '')
+R2_BUCKET_NAME = os.getenv('R2_BUCKET_NAME', '')
+R2_ENDPOINT_URL = os.getenv('R2_ENDPOINT_URL', '')
+# URL publica del bucket (ej: https://pub-xxx.r2.dev o https://media.ibyzacorp.com).
+# Si esta vacia, las URLs apuntan al endpoint S3 (mas feo pero funciona).
+R2_PUBLIC_URL = os.getenv('R2_PUBLIC_URL', '').rstrip('/')
+
+USE_R2 = bool(R2_ACCESS_KEY_ID and R2_BUCKET_NAME and R2_ENDPOINT_URL)
+
+if USE_R2:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'storages.backends.s3.S3Storage',
+            'OPTIONS': {
+                'access_key': R2_ACCESS_KEY_ID,
+                'secret_key': R2_SECRET_ACCESS_KEY,
+                'bucket_name': R2_BUCKET_NAME,
+                'endpoint_url': R2_ENDPOINT_URL,
+                'region_name': 'auto',  # R2 ignora region pero boto3 la requiere
+                'signature_version': 's3v4',
+                'addressing_style': 'virtual',
+                'default_acl': None,  # R2 no soporta ACLs
+                'querystring_auth': False,  # URLs publicas sin firma
+                'object_parameters': {
+                    'CacheControl': 'public, max-age=31536000, immutable',
+                },
+                'custom_domain': R2_PUBLIC_URL.replace('https://', '').replace('http://', '') or None,
+                'url_protocol': 'https:',
+            },
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
+else:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        },
+    }
 
 # ─── CORS ─────────────────────────────────────────────────────────────────────
 CORS_ALLOWED_ORIGINS = os.getenv(
@@ -135,6 +215,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/min',
+        'datos_bancarios': '5/min',
     },
 }
 
@@ -152,16 +233,19 @@ RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
 #   RESEND_FROM_EMAIL=IBYZA <no-reply@ibyzacorp.com>
 RESEND_FROM_EMAIL = os.getenv('RESEND_FROM_EMAIL', 'IBYZA <onboarding@resend.dev>')
 
-# Destinatarios de notificaciones (contacto + citas)
-# EMAIL_RECIPIENTS=correo1@x.com,correo2@y.com
+# Destinatarios de notificaciones (contacto + citas).
+# Configurar en Railway/Render con: EMAIL_RECIPIENTS=correo1@x.com,correo2@y.com
+# Si no se configura en produccion, las notificaciones no se envian (no rompe la peticion).
 EMAIL_RECIPIENTS = [
     e.strip()
-    for e in os.getenv(
-        'EMAIL_RECIPIENTS',
-        'stephano.cornejoc@gmail.com,valeriaemanuel1@gmail.com',
-    ).split(',')
+    for e in os.getenv('EMAIL_RECIPIENTS', '').split(',')
     if e.strip()
 ]
+if not EMAIL_RECIPIENTS and not DEBUG:
+    import logging
+    logging.getLogger('ibyza').warning(
+        'EMAIL_RECIPIENTS no esta configurado. Las notificaciones de contacto y citas no se enviaran.'
+    )
 
 # Legacy — mantenemos EMAIL_BACKEND para fallbacks y comandos Django (send_mail etc)
 if DEBUG:
@@ -182,6 +266,11 @@ UNFOLD = {
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": False,
+    # Persiste el scroll del sidebar entre navegaciones (sino al abrir
+    # cualquier modulo el sidebar vuelve arriba y se pierde el hilo).
+    "SCRIPTS": [
+        lambda request: "/static/admin/js/sidebar-scroll-memory.js",
+    ],
     # Colores de marca IBYZA (azul #0F233B)
     "COLORS": {
         "primary": {

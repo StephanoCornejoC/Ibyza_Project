@@ -101,7 +101,10 @@ class CitaEmailTest(ResendMockMixin, BaseTestData, TestCase):
         data = self.datos_cita()
         response = self.client.post('/api/contacto/citas/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(len(self.sent_emails), 1)
+        # Se envian 2 emails: notificacion al admin + confirmacion al solicitante (.ics adjunto)
+        self.assertEqual(len(self.sent_emails), 2)
+        admin_emails = [e for e in self.sent_emails if e['to'] == ['admin@ibyza.com']]
+        self.assertEqual(len(admin_emails), 1)
 
     def test_cita_email_incluye_tipo(self):
         data = self.datos_cita(tipo='virtual')

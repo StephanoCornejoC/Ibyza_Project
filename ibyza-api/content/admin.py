@@ -59,6 +59,32 @@ class ConfiguracionSitioAdmin(ModelAdmin):
             'description': 'Slogan y descripción que se usan en SEO y secciones del sitio.',
             'fields': ('slogan', 'descripcion_empresa'),
         }),
+        ('🎉 Modal de bienvenida', {
+            'description': 'Modal que aparece a los visitantes al entrar al sitio (una vez por sesión). Activá el checkbox y completá los demás campos.',
+            'fields': (
+                'modal_activo',
+                'modal_titulo',
+                'modal_subtitulo',
+                'modal_imagen',
+                'modal_proyecto',
+                'modal_cta_texto',
+                'modal_cta_es_whatsapp',
+            ),
+        }),
+        ('📅 Citas y reuniones', {
+            'description': 'Configuración usada en las confirmaciones de cita por correo.',
+            'fields': ('meet_link_permanente',),
+        }),
+        ('📜 Politicas de Privacidad', {
+            'description': 'Texto que aparece en el modal cuando el visitante clickea "Politicas de Privacidad" en el formulario de cita. Soporta HTML basico.',
+            'fields': ('politicas_privacidad_html',),
+            'classes': ('collapse',),
+        }),
+        ('📜 Origen del nombre (no se muestra actualmente)', {
+            'description': 'Texto sobre el origen del nombre IBYZA. Por ahora no se renderiza en el sitio; queda guardado por si se decide reactivarlo en el futuro.',
+            'classes': ('collapse',),
+            'fields': ('origen_nombre_texto',),
+        }),
     )
 
     def has_add_permission(self, request):
