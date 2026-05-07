@@ -40,16 +40,19 @@ services:
       pip install -r requirements.txt
       python manage.py collectstatic --noinput
 
-    # Solo migrate + create_admin + gunicorn.
-    # Las seeds (seed_proyectos, seed_contenido) se corren UNA VEZ desde
-    # "Render Shell" tras el primer deploy, no en cada release, para no
-    # sobrescribir cambios que Diana haya hecho desde el admin.
+    # En free tier de Render no existe preDeployCommand, asi que TODO va al
+    # startCommand. Es seguro porque los seeds son idempotentes (get_or_create):
+    # si la BD ya tiene datos, no toca nada; si esta vacia, los crea.
+    # createcachetable es idempotente (no falla si la tabla ya existe).
     startCommand: |
       python manage.py migrate --noinput
+      python manage.py createcachetable django_cache_table
       python manage.py create_admin
+      python manage.py seed_contenido
+      python manage.py seed_proyectos
       gunicorn ibyza.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
 
-    healthCheckPath: /admin/login/
+    healthCheckPath: /healthz/
 
     envVars:
       # ─── Django core ──────────────────────────────────────────────────────
