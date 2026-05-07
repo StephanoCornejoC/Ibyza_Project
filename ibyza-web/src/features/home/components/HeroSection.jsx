@@ -38,9 +38,14 @@ const HeroSection = ({ content }) => {
   const rafRef = useRef(null)
 
   useEffect(() => {
-    // Respetar prefers-reduced-motion: skip animacion de particles.
+    // Skip animacion de particles si:
+    //  - el usuario pidio prefers-reduced-motion, o
+    //  - es un touch device (pointer: coarse): un canvas con rAF infinito
+    //    en mobile drena bateria y compite con el scroll nativo causando jank.
+    //    El canvas queda invisible (no se pinta) sin afectar el layout.
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReduced) return
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    if (prefersReduced || isCoarsePointer) return
 
     const canvas = canvasRef.current
     if (!canvas) return
@@ -48,9 +53,7 @@ const HeroSection = ({ content }) => {
     let width = (canvas.width = canvas.offsetWidth)
     let height = (canvas.height = canvas.offsetHeight)
 
-    // En dispositivos tactiles (mobile/tablet) usar menos particles para ahorrar bateria.
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
-    const particleCount = isCoarsePointer ? 25 : 50
+    const particleCount = 50
 
     particlesRef.current = Array.from({ length: particleCount }, () => ({
       x: Math.random() * width,

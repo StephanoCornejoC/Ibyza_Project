@@ -44,10 +44,16 @@ const ProjectsCarousel = ({ projects, loading }) => {
   const pausedRef = useRef(false)
   const resumeTimerRef = useRef(null)
   const isMobile = useMediaQuery('(max-width: 480px)')
+  // En touch devices (mobile/tablet) dejamos que el scroll nativo + scroll-snap
+  // manejen el carrusel. El rAF de marquee compite con el touch del usuario y
+  // congela la card cuando el dedo esta apoyado. Se desactiva el avance auto.
+  const isCoarsePointer = useMediaQuery('(pointer: coarse)')
 
-  // Triplicamos el array para que el loop sea seamless.
+  // Triplicamos el array SOLO en desktop para que el loop sea seamless.
+  // En touch usamos el array tal cual: el usuario hace swipe especifico,
+  // no quiere ver los mismos proyectos repetidos 3 veces.
   const tripled = projects && projects.length
-    ? [...projects, ...projects, ...projects]
+    ? (isCoarsePointer ? [...projects] : [...projects, ...projects, ...projects])
     : []
 
   const getStep = useCallback(() => {
@@ -86,7 +92,10 @@ const ProjectsCarousel = ({ projects, loading }) => {
 
   // Loop de marquee + wrap-around para que el scroll siga siempre dentro
   // del segundo tercio "visible". Esto da el efecto infinito.
+  // En touch devices NO arrancamos el rAF: el usuario hace swipe nativo y
+  // el scroll-snap del CSS se encarga del UX.
   useEffect(() => {
+    if (isCoarsePointer) return undefined
     const track = trackRef.current
     if (!track || !projects || projects.length === 0) return undefined
 
@@ -130,7 +139,7 @@ const ProjectsCarousel = ({ projects, loading }) => {
       if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
       window.removeEventListener('resize', positionMiddle)
     }
-  }, [projects])
+  }, [projects, isCoarsePointer])
 
   if (loading) return <Spinner size="lg" centered />
 
@@ -328,6 +337,15 @@ const Track = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  // En touch devices (mobile/tablet) usamos scroll-snap nativo + momentum
+  // de iOS. El JS marquee no corre en estos dispositivos, asi que el swipe
+  // del usuario manda. Desktop con mouse mantiene el marquee continuo.
+  @media (pointer: coarse) {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-left: ${({ theme }) => theme.spacing.md};
+  }
 `
 
 const SlideCard = styled.a`
@@ -341,6 +359,12 @@ const SlideCard = styled.a`
   transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
   display: flex;
   flex-direction: column;
+
+  // Cada card es un snap point en touch. Solo aplica cuando el Track
+  // activa scroll-snap-type (pointer: coarse).
+  @media (pointer: coarse) {
+    scroll-snap-align: start;
+  }
 
   /* Mobile: ~2-2.5 cards */
   @media (max-width: 480px) {

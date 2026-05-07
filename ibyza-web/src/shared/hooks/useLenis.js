@@ -7,12 +7,14 @@ import Lenis from 'lenis'
  */
 export function useLenis() {
   useEffect(() => {
-    // Respetar prefers-reduced-motion: si el usuario lo solicita, no inicializar
-    // Lenis y dejar que el navegador maneje el scroll nativo.
-    const prefersReduced =
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReduced) return
+    // Respetar prefers-reduced-motion y skip en touch devices: en mobile/tablet
+    // el scroll nativo del navegador es ultra fluido y Lenis introduce jank al
+    // interceptar wheel/touch globalmente. Solo activamos Lenis en desktop con
+    // mouse (pointer: fine), donde aporta smooth wheel real.
+    if (typeof window === 'undefined') return
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    if (prefersReduced || isCoarsePointer) return
 
     const lenis = new Lenis({
       duration: 1.4,
