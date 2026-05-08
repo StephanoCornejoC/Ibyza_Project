@@ -219,13 +219,18 @@ class Command(BaseCommand):
 
     def _cargar_fachada(self, proyecto):
         """
-        Carga la fachada desde seed_assets/proyectos/<slug>/fachada.<ext> al
-        ImageField si el campo esta vacio O si apunta a un archivo que ya no
-        existe en el storage activo (caso tipico: filesystem efimero de Render
-        que pierde media/ en cada deploy).
+        Carga la fachada desde seed_assets/proyectos/<slug>/fachada.<ext>.
 
-        NO recarga si la fachada existe fisicamente — eso preserva cualquier
-        imagen que Diana haya subido desde el admin.
+        Usa nombre prefijado con slug ('<slug>-fachada.png') para que cada
+        proyecto tenga su archivo unico en el storage. Sin esto, el storage
+        S3-compatible (R2) sobreescribia archivos entre proyectos cuando
+        todos usaban el mismo nombre 'fachada.png'.
+
+        Recarga si:
+          - El campo esta vacio.
+          - El archivo fisico no existe en el storage activo.
+          - El nombre actual NO empieza con 'proyectos/<slug>-' (path viejo
+            de antes del fix de nombres unicos).
         """
         seed_assets = Path(settings.BASE_DIR) / 'seed_assets' / 'proyectos' / proyecto.slug
         if not seed_assets.exists():
@@ -235,36 +240,74 @@ class Command(BaseCommand):
         if not fachada_path:
             return False
 
-        # Solo recargamos si NO hay imagen, o si el archivo fisico desaparecio
-        ya_existe = bool(proyecto.imagen_fachada) and proyecto.imagen_fachada.storage.exists(
-            proyecto.imagen_fachada.name
+        nombre_destino = f'{proyecto.slug}-fachada{fachada_path.suffix}'
+        prefijo_correcto = f'proyectos/{proyecto.slug}-fachada'
+
+        ya_correcta = (
+            bool(proyecto.imagen_fachada)
+            and proyecto.imagen_fachada.name.startswith(prefijo_correcto)
+            and proyecto.imagen_fachada.storage.exists(proyecto.imagen_fachada.name)
         )
-        if ya_existe:
+        if ya_correcta:
             return False
 
+        # Liberamos el path viejo (puede apuntar a un archivo compartido) y
+        # guardamos con el nombre prefijado por slug.
+        proyecto.imagen_fachada = None
         with open(fachada_path, 'rb') as f:
-            proyecto.imagen_fachada.save(fachada_path.name, File(f), save=True)
+            proyecto.imagen_fachada.save(nombre_destino, File(f), save=True)
         return True
 
     def _cargar_galeria(self, proyecto):
         """
         Sube las imagenes de seed_assets/proyectos/<slug>/galeria/ como
-        ImagenGaleria si todavia no hay galeria cargada para este proyecto.
+        ImagenGaleria con nombres unicos por proyecto ('<slug>-img-N.png').
 
-        Idempotente: si ya hay imagenes (por ejemplo, Diana subio nuevas
-        desde el admin), NO toca nada.
+        Sin nombres unicos, el storage S3-compatible (R2) sobreescribia las
+        imagenes entre proyectos: todos terminaban viendo la misma galeria.
+
+        Si las galerias actuales NO tienen prefijo correcto, las borra y
+        recarga. Si Diana sube imagenes nuevas con nombres distintos al
+        prefijo del seed, esas se respetan.
         """
         galeria_dir = Path(settings.BASE_DIR) / 'seed_assets' / 'proyectos' / proyecto.slug / 'galeria'
         if not galeria_dir.exists():
             return 0
 
-        # Si ya hay galeria, respetamos lo que Diana haya cargado
-        if ImagenGaleria.objects.filter(proyecto=proyecto).exists():
-            return 0
-
         archivos = sorted(galeria_dir.glob('img-*.png'))
         if not archivos:
             return 0
+
+        prefijo_correcto = f'galeria/{proyecto.slug}-img-'
+
+        # Galerias del seed (creadas anteriormente con prefijo viejo "img-N.png")
+        # tienen nombres como "galeria/img-1.png" — sin slug. Las borramos para
+        # rehacerlas con nombre unico. Las que Diana subio quedan intactas si
+        # tienen otro patron.
+        viejas_seed = ImagenGaleria.objects.filter(
+            proyecto=proyecto,
+        ).filter(
+            imagen__regex=r'galeria/img-\d+'
+        )
+        if viejas_seed.exists():
+            viejas_seed.delete()
+
+        # Si ya hay galerias correctas con el prefijo del slug y la cantidad
+        # coincide, no hacemos nada.
+        existen_correctas = ImagenGaleria.objects.filter(
+            proyecto=proyecto,
+            imagen__startswith=prefijo_correcto,
+        ).count()
+        if existen_correctas == len(archivos):
+            return 0
+
+        # Si quedan algunas con el prefijo correcto pero faltan otras, dejamos
+        # las existentes y agregamos las que faltan; sino creamos todo.
+        # Para simplicidad: recreamos las del seed completas.
+        ImagenGaleria.objects.filter(
+            proyecto=proyecto,
+            imagen__startswith=prefijo_correcto,
+        ).delete()
 
         cargadas = 0
         for idx, ruta in enumerate(archivos, start=1):
@@ -273,8 +316,9 @@ class Command(BaseCommand):
                 descripcion=f'{proyecto.nombre} - foto {idx}',
                 orden=idx,
             )
+            nombre_destino = f'{proyecto.slug}-img-{idx}{ruta.suffix}'
             with open(ruta, 'rb') as f:
-                img.imagen.save(ruta.name, File(f), save=True)
+                img.imagen.save(nombre_destino, File(f), save=True)
             cargadas += 1
         return cargadas
 
