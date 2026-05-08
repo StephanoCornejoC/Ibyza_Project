@@ -18,7 +18,19 @@ class ContenidoWebAdmin(ModelAdmin):
     list_filter = ('seccion', 'activo')
     search_fields = ('clave', 'valor')
     list_editable = ('activo',)
+    ordering = ('seccion', 'clave')
     save_on_top = True
+
+    fieldsets = (
+        ('Ubicación en el sitio', {
+            'description': 'En qué sección de la web aparece este texto. El identificador interno es técnico — no lo cambies si no estás segura de lo que hacés.',
+            'fields': ('seccion', 'clave', 'activo'),
+        }),
+        ('Contenido visible', {
+            'description': 'El texto y la imagen que va a ver el cliente en el sitio.',
+            'fields': ('valor', 'imagen'),
+        }),
+    )
 
     @admin.display(description='Sección', ordering='seccion')
     def get_seccion_display(self, obj):
@@ -39,7 +51,7 @@ class ContenidoWebAdmin(ModelAdmin):
                 obj.imagen.url,
             )
         return mark_safe(
-            '<div style="width:50px;height:38px;background:#f3f4f6;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:18px;">📝</div>'
+            '<div style="width:50px;height:38px;background:#f3f4f6;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:11px;">Texto</div>'
         )
 
 
@@ -47,20 +59,20 @@ class ContenidoWebAdmin(ModelAdmin):
 class ConfiguracionSitioAdmin(ModelAdmin):
     save_on_top = True
     fieldsets = (
-        ('📞 Datos de contacto', {
-            'description': 'Estos datos aparecen en el footer y en la página de contacto del sitio.',
+        ('Datos de contacto', {
+            'description': 'Estos datos aparecen en el pie de página (footer) y en la página de contacto del sitio.',
             'fields': ('direccion', 'telefono', 'email', 'horario', 'whatsapp'),
         }),
-        ('🌐 Redes sociales', {
-            'description': 'Pega las URL completas. Deja en blanco las redes que no uses.',
+        ('Redes sociales', {
+            'description': 'Pegá las URL completas (con https://). Dejá en blanco las redes que la empresa no usa.',
             'fields': ('facebook_url', 'instagram_url', 'tiktok_url', 'linkedin_url', 'youtube_url'),
         }),
-        ('🏷️ Branding', {
-            'description': 'Slogan y descripción que se usan en SEO y secciones del sitio.',
+        ('Slogan y descripción de la empresa', {
+            'description': 'Frase principal y descripción que se usan en el inicio del sitio y en metadatos para Google.',
             'fields': ('slogan', 'descripcion_empresa'),
         }),
-        ('🎉 Modal de bienvenida', {
-            'description': 'Modal que aparece a los visitantes al entrar al sitio (una vez por sesión). Activá el checkbox y completá los demás campos.',
+        ('Modal de bienvenida', {
+            'description': 'Cuadro que aparece a los visitantes al entrar al sitio (una vez por sesión). Marcá "Modal activo" y completá los demás campos.',
             'fields': (
                 'modal_activo',
                 'modal_titulo',
@@ -71,16 +83,16 @@ class ConfiguracionSitioAdmin(ModelAdmin):
                 'modal_cta_es_whatsapp',
             ),
         }),
-        ('📅 Citas y reuniones', {
-            'description': 'Configuración usada en las confirmaciones de cita por correo.',
+        ('Citas y reuniones', {
+            'description': 'Configuración que se usa al enviar la confirmación de cita por correo al cliente.',
             'fields': ('meet_link_permanente',),
         }),
-        ('📜 Politicas de Privacidad', {
-            'description': 'Texto que aparece en el modal cuando el visitante clickea "Politicas de Privacidad" en el formulario de cita. Soporta HTML basico.',
+        ('Políticas de Privacidad', {
+            'description': 'Texto que aparece cuando el visitante hace clic en "Políticas de Privacidad" del formulario de cita. Acepta HTML básico (p, ul, li, strong, br).',
             'fields': ('politicas_privacidad_html',),
             'classes': ('collapse',),
         }),
-        ('📜 Origen del nombre (no se muestra actualmente)', {
+        ('Origen del nombre IBYZA (no se muestra actualmente)', {
             'description': 'Texto sobre el origen del nombre IBYZA. Por ahora no se renderiza en el sitio; queda guardado por si se decide reactivarlo en el futuro.',
             'classes': ('collapse',),
             'fields': ('origen_nombre_texto',),
@@ -112,6 +124,18 @@ class PreguntaFrecuenteAdmin(ModelAdmin):
     list_filter = ('activo',)
     search_fields = ('pregunta', 'respuesta')
     list_editable = ('orden', 'activo')
+    ordering = ('orden', 'pregunta')
+    save_on_top = True
+
+    fieldsets = (
+        ('Pregunta y respuesta', {
+            'description': 'Esta pregunta aparece en la sección de preguntas frecuentes del sitio.',
+            'fields': ('pregunta', 'respuesta'),
+        }),
+        ('Visibilidad', {
+            'fields': ('orden', 'activo'),
+        }),
+    )
 
     @admin.display(description='Pregunta')
     def pregunta_corta(self, obj):
@@ -126,6 +150,21 @@ class TestimonioAdmin(ModelAdmin):
     search_fields = ('nombre', 'cargo', 'testimonio')
     list_editable = ('orden', 'activo')
     autocomplete_fields = ('proyecto',)
+    ordering = ('orden', '-id')
+    save_on_top = True
+
+    fieldsets = (
+        ('Datos del cliente', {
+            'description': 'Quién dejó el testimonio. La foto y el cargo son opcionales pero recomendados.',
+            'fields': ('nombre', 'cargo', 'foto'),
+        }),
+        ('Testimonio', {
+            'fields': ('testimonio', 'calificacion', 'proyecto'),
+        }),
+        ('Visibilidad', {
+            'fields': ('orden', 'activo'),
+        }),
+    )
 
     @admin.display(description='Foto')
     def foto_thumb(self, obj):
@@ -154,6 +193,22 @@ class BeneficioAdmin(ModelAdmin):
     list_filter = ('activo',)
     search_fields = ('titulo', 'descripcion')
     list_editable = ('orden', 'activo')
+    ordering = ('orden',)
+    save_on_top = True
+
+    fieldsets = (
+        ('Texto del beneficio', {
+            'description': 'Aparece en la sección "Por qué IBYZA" del inicio.',
+            'fields': ('titulo', 'descripcion'),
+        }),
+        ('Icono', {
+            'description': 'Pegá el nombre exacto de un icono de https://lucide.dev/icons (ejemplo: Home, Key, Award, ShieldCheck). Solo cambialo si sabés lo que hacés.',
+            'fields': ('icono',),
+        }),
+        ('Visibilidad', {
+            'fields': ('orden', 'activo'),
+        }),
+    )
 
     @admin.display(description='Icono')
     def icono_preview(self, obj):

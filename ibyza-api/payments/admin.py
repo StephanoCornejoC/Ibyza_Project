@@ -28,7 +28,8 @@ class SeparacionAdmin(ModelAdmin):
     save_on_top = True
 
     fieldsets = (
-        ('👤 Datos del comprador', {
+        ('Datos del comprador', {
+            'description': 'Cliente que realizó la separación. El departamento se asocia automáticamente desde el formulario web.',
             'fields': (
                 'departamento',
                 ('nombre', 'apellido'),
@@ -36,7 +37,8 @@ class SeparacionAdmin(ModelAdmin):
                 ('dni', 'monto'),
             ),
         }),
-        ('💳 Información de pago', {
+        ('Información de pago', {
+            'description': 'Pagos con tarjeta (Culqi) se aprueban automáticamente. Las transferencias requieren tu aprobación manual desde la lista (acción "Aprobar transferencia").',
             'fields': (
                 ('metodo_pago', 'estado'),
                 'culqi_charge_id',
@@ -45,7 +47,7 @@ class SeparacionAdmin(ModelAdmin):
                 'error',
             ),
         }),
-        ('📅 Registro', {
+        ('Registro', {
             'fields': ('registrado_en',),
         }),
     )
@@ -71,9 +73,9 @@ class SeparacionAdmin(ModelAdmin):
     @admin.display(description='Estado', ordering='estado')
     def estado_badge(self, obj):
         config = {
-            'pendiente': ('#f59e0b', '⏳ Pendiente'),
-            'completado': ('#22c55e', '✓ Aprobada'),
-            'fallido': ('#ef4444', '✗ Rechazada'),
+            'pendiente': ('#f59e0b', 'Pendiente'),
+            'completado': ('#22c55e', 'Aprobada'),
+            'fallido': ('#ef4444', 'Rechazada'),
         }
         color, label = config.get(obj.estado, ('#6b7280', obj.estado))
         return format_html(
@@ -84,8 +86,8 @@ class SeparacionAdmin(ModelAdmin):
     @admin.display(description='Método', ordering='metodo_pago')
     def metodo_badge(self, obj):
         config = {
-            'culqi': ('#6366f1', '💳 Tarjeta'),
-            'transferencia': ('#0ea5e9', '🏦 Transferencia'),
+            'culqi': ('#6366f1', 'Tarjeta'),
+            'transferencia': ('#0ea5e9', 'Transferencia'),
         }
         color, label = config.get(obj.metodo_pago, ('#6b7280', obj.metodo_pago))
         return format_html(
@@ -99,10 +101,10 @@ class SeparacionAdmin(ModelAdmin):
             return mark_safe('<span style="color:#9ca3af">N/A</span>')
         if obj.comprobante:
             return format_html(
-                '<a href="{}" target="_blank" style="color:#22c55e;font-weight:600">📎 Ver</a>',
+                '<a href="{}" target="_blank" style="color:#22c55e;font-weight:600">Ver</a>',
                 obj.comprobante.url,
             )
-        return mark_safe('<span style="color:#ef4444">⚠ Falta</span>')
+        return mark_safe('<span style="color:#ef4444;font-weight:600">Falta</span>')
 
     @admin.display(description='Vista previa del comprobante')
     def comprobante_preview(self, obj):
@@ -116,7 +118,7 @@ class SeparacionAdmin(ModelAdmin):
             )
         return mark_safe('<span style="color:#9ca3af">Sin comprobante</span>')
 
-    @admin.action(description='✓ Aprobar transferencia (marca depto como SEPARADO)')
+    @admin.action(description='Aprobar transferencia (marca depto como SEPARADO)')
     def aprobar_transferencia(self, request, queryset):
         elegibles = queryset.filter(estado='pendiente', metodo_pago='transferencia')
         descartadas = queryset.count() - elegibles.count()
@@ -132,7 +134,7 @@ class SeparacionAdmin(ModelAdmin):
             msg += f' ({descartadas} ignorada(s) por no ser transferencias pendientes.)'
         self.message_user(request, msg)
 
-    @admin.action(description='✗ Rechazar transferencia (libera el departamento)')
+    @admin.action(description='Rechazar transferencia (libera el departamento)')
     def rechazar_transferencia(self, request, queryset):
         from django.contrib import messages
         if 'apply' not in request.POST:

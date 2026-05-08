@@ -287,49 +287,13 @@ UNFOLD = {
             "950": "9   24  39",
         },
     },
-    # Menú lateral organizado por secciones de negocio
+    # Menu lateral organizado por frecuencia de uso (lo mas usado primero)
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": False,
         "navigation": [
             {
-                "title": "🏢 Proyectos inmobiliarios",
-                "separator": True,
-                "items": [
-                    {
-                        "title": "Proyectos",
-                        "icon": "apartment",
-                        "link": reverse_lazy("admin:projects_proyecto_changelist"),
-                    },
-                    {
-                        "title": "Pisos / Niveles",
-                        "icon": "stacks",
-                        "link": reverse_lazy("admin:projects_nivel_changelist"),
-                    },
-                    {
-                        "title": "Departamentos",
-                        "icon": "door_open",
-                        "link": reverse_lazy("admin:projects_departamento_changelist"),
-                    },
-                    {
-                        "title": "Avances de obra",
-                        "icon": "construction",
-                        "link": reverse_lazy("admin:projects_avancedeobra_changelist"),
-                    },
-                    {
-                        "title": "Galería de fotos",
-                        "icon": "photo_library",
-                        "link": reverse_lazy("admin:projects_imagengaleria_changelist"),
-                    },
-                    {
-                        "title": "Videos",
-                        "icon": "play_circle",
-                        "link": reverse_lazy("admin:projects_videoproyecto_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": "📨 Mensajes y citas",
+                "title": "Mensajes y citas",
                 "separator": True,
                 "items": [
                     {
@@ -346,7 +310,74 @@ UNFOLD = {
                 ],
             },
             {
-                "title": "💳 Pagos / Separaciones",
+                "title": "Proyectos inmobiliarios",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Proyectos",
+                        "icon": "apartment",
+                        "link": reverse_lazy("admin:projects_proyecto_changelist"),
+                    },
+                    {
+                        "title": "Avances de obra",
+                        "icon": "construction",
+                        "link": reverse_lazy("admin:projects_avancedeobra_changelist"),
+                    },
+                    {
+                        "title": "Galería de fotos",
+                        "icon": "photo_library",
+                        "link": reverse_lazy("admin:projects_imagengaleria_changelist"),
+                    },
+                    {
+                        "title": "Videos",
+                        "icon": "play_circle",
+                        "link": reverse_lazy("admin:projects_videoproyecto_changelist"),
+                    },
+                    {
+                        "title": "Pisos / Niveles",
+                        "icon": "stacks",
+                        "link": reverse_lazy("admin:projects_nivel_changelist"),
+                    },
+                    {
+                        "title": "Departamentos",
+                        "icon": "door_open",
+                        "link": reverse_lazy("admin:projects_departamento_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Contenido del sitio",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Configuracion general",
+                        "icon": "settings",
+                        "link": reverse_lazy("admin:content_configuracionsitio_changelist"),
+                    },
+                    {
+                        "title": "Textos e imagenes",
+                        "icon": "edit_note",
+                        "link": reverse_lazy("admin:content_contenidoweb_changelist"),
+                    },
+                    {
+                        "title": "Testimonios",
+                        "icon": "format_quote",
+                        "link": reverse_lazy("admin:content_testimonio_changelist"),
+                    },
+                    {
+                        "title": "Preguntas frecuentes",
+                        "icon": "help",
+                        "link": reverse_lazy("admin:content_preguntafrecuente_changelist"),
+                    },
+                    {
+                        "title": "Beneficios / Valores",
+                        "icon": "star",
+                        "link": reverse_lazy("admin:content_beneficio_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Pagos / Separaciones",
                 "separator": True,
                 "items": [
                     {
@@ -357,38 +388,7 @@ UNFOLD = {
                 ],
             },
             {
-                "title": "🌐 Contenido del sitio",
-                "separator": True,
-                "items": [
-                    {
-                        "title": "Configuración general",
-                        "icon": "settings",
-                        "link": reverse_lazy("admin:content_configuracionsitio_changelist"),
-                    },
-                    {
-                        "title": "Textos e imágenes",
-                        "icon": "edit_note",
-                        "link": reverse_lazy("admin:content_contenidoweb_changelist"),
-                    },
-                    {
-                        "title": "Preguntas frecuentes",
-                        "icon": "help",
-                        "link": reverse_lazy("admin:content_preguntafrecuente_changelist"),
-                    },
-                    {
-                        "title": "Testimonios",
-                        "icon": "format_quote",
-                        "link": reverse_lazy("admin:content_testimonio_changelist"),
-                    },
-                    {
-                        "title": "Beneficios / Valores",
-                        "icon": "star",
-                        "link": reverse_lazy("admin:content_beneficio_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": "👥 Usuarios y accesos",
+                "title": "Usuarios y accesos",
                 "separator": True,
                 "items": [
                     {

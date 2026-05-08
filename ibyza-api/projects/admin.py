@@ -61,18 +61,21 @@ class ProyectoAdmin(ModelAdmin):
     save_on_top = True
 
     fieldsets = (
-        ('📝 Información principal', {
+        ('Información principal', {
+            'description': 'Datos básicos del proyecto. Todo lo de aquí es lo más importante para que aparezca en la web.',
             'fields': ('nombre', 'slug', 'estado', 'precio_desde', 'orden', 'activo'),
         }),
-        ('📄 Descripción', {
+        ('Descripción y ubicación', {
+            'description': 'Texto que verán los clientes en el listado y en la página de detalle del proyecto.',
             'fields': ('descripcion_corta', 'descripcion', 'ubicacion', 'google_maps_embed'),
         }),
-        ('🖼️ Imágenes y archivos', {
+        ('Imágenes y archivos', {
+            'description': 'Foto principal de la fachada, render del edificio y catálogo descargable. Recomendado 1200x800 px.',
             'fields': ('imagen_fachada', 'imagen_isometrico', 'catalogo_pdf'),
         }),
-        ('🏦 Datos bancarios para transferencia', {
+        ('Datos bancarios para transferencia', {
             'classes': ('collapse',),
-            'description': 'Estos datos se mostrarán al cliente cuando elija pagar la separación por transferencia bancaria.',
+            'description': 'Estos datos se mostrarán al cliente cuando elija pagar la separación por transferencia bancaria. Solo completalos si este proyecto recibe pagos por transferencia.',
             'fields': (
                 'empresa_receptora', 'empresa_ruc', 'empresa_banco',
                 'cuenta_soles', 'cci_soles',
@@ -134,6 +137,9 @@ class NivelAdmin(ModelAdmin):
     list_display = ('proyecto', 'numero', 'nombre', 'departamentos_count')
     list_filter = ('proyecto',)
     search_fields = ('proyecto__nombre', 'nombre')
+    autocomplete_fields = ('proyecto',)
+    ordering = ('proyecto__nombre', 'numero')
+    save_on_top = True
     inlines = [DepartamentoInline]
 
     @admin.display(description='Departamentos')
@@ -153,6 +159,22 @@ class DepartamentoAdmin(ModelAdmin):
     search_fields = ('codigo', 'nivel__proyecto__nombre')
     list_editable = ()
     autocomplete_fields = ('nivel',)
+    ordering = ('nivel__proyecto__nombre', 'nivel__numero', 'codigo')
+    save_on_top = True
+
+    fieldsets = (
+        ('Ubicación dentro del proyecto', {
+            'description': 'Indica en qué piso del proyecto está este departamento.',
+            'fields': ('nivel', 'codigo', 'tipo'),
+        }),
+        ('Áreas y precio', {
+            'fields': ('area_total', 'area_techada', 'precio'),
+        }),
+        ('Estado y descripción', {
+            'description': 'El estado se actualiza automáticamente cuando un cliente separa el departamento.',
+            'fields': ('estado', 'descripcion', 'imagen_planta'),
+        }),
+    )
 
     @admin.display(description='Proyecto', ordering='nivel__proyecto__nombre')
     def get_proyecto(self, obj):
@@ -191,6 +213,19 @@ class AvanceDeObraAdmin(ModelAdmin):
     list_editable = ('publicado',)
     date_hierarchy = 'fecha'
     autocomplete_fields = ('proyecto',)
+    ordering = ('-fecha',)
+    save_on_top = True
+
+    fieldsets = (
+        ('Datos del avance', {
+            'description': 'A qué proyecto corresponde este avance, qué se hizo y cuándo.',
+            'fields': ('proyecto', 'titulo', 'fecha', 'publicado'),
+        }),
+        ('Contenido', {
+            'description': 'Texto y foto que verán los clientes en la sección de avances de obra.',
+            'fields': ('contenido', 'imagen'),
+        }),
+    )
 
     @admin.display(description='Foto')
     def thumbnail(self, obj):
@@ -211,6 +246,8 @@ class VideoProyectoAdmin(ModelAdmin):
     search_fields = ('titulo', 'proyecto__nombre')
     list_editable = ('orden',)
     autocomplete_fields = ('proyecto',)
+    ordering = ('proyecto__nombre', 'orden')
+    save_on_top = True
 
 
 @admin.register(ImagenGaleria)
@@ -221,6 +258,8 @@ class ImagenGaleriaAdmin(ModelAdmin):
     search_fields = ('descripcion', 'proyecto__nombre')
     list_editable = ('orden',)
     autocomplete_fields = ('proyecto',)
+    ordering = ('proyecto__nombre', 'orden')
+    save_on_top = True
 
     @admin.display(description='Imagen')
     def thumbnail(self, obj):

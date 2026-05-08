@@ -19,20 +19,22 @@ class SolicitudContactoAdmin(ModelAdmin):
     list_display_links = ('nombre_completo',)
     list_filter = ('leido', 'recibido_en')
     search_fields = ('nombre', 'apellido', 'email', 'telefono', 'mensaje')
-    list_editable = ('proyecto_interes',)  # quitamos leido para usar action
     readonly_fields = ('recibido_en',)
     date_hierarchy = 'recibido_en'
+    ordering = ('-recibido_en',)
     actions = ['marcar_leido', 'marcar_no_leido']
     save_on_top = True
 
     fieldsets = (
-        ('Cliente', {
+        ('Datos del cliente', {
+            'description': 'Persona que envió el mensaje desde el formulario de contacto del sitio.',
             'fields': ('nombre', 'apellido', 'email', 'telefono'),
         }),
-        ('Mensaje', {
+        ('Mensaje recibido', {
             'fields': ('proyecto_interes', 'mensaje'),
         }),
         ('Seguimiento', {
+            'description': 'Marcá "Leído" cuando ya hayas atendido al cliente.',
             'fields': ('leido', 'recibido_en'),
         }),
     )
@@ -40,8 +42,8 @@ class SolicitudContactoAdmin(ModelAdmin):
     @admin.display(description='Estado', ordering='leido')
     def estado_lectura(self, obj):
         if obj.leido:
-            return mark_safe('<span style="color:#22c55e;font-weight:700;font-size:13px">✓ Leído</span>')
-        return mark_safe('<span style="color:#ef4444;font-weight:700;font-size:13px">● Nuevo</span>')
+            return mark_safe('<span style="color:#22c55e;font-weight:700;font-size:13px">Leido</span>')
+        return mark_safe('<span style="color:#ef4444;font-weight:700;font-size:13px">Nuevo</span>')
 
     @admin.display(description='Nombre')
     def nombre_completo(self, obj):
@@ -54,15 +56,15 @@ class SolicitudContactoAdmin(ModelAdmin):
             return format_html('<span title="{}">{}</span>', obj.mensaje, preview)
         return '—'
 
-    @admin.action(description='✓ Marcar seleccionados como leídos')
+    @admin.action(description='Marcar seleccionados como leidos')
     def marcar_leido(self, request, queryset):
         updated = queryset.update(leido=True)
-        self.message_user(request, f'{updated} mensaje(s) marcado(s) como leído(s).')
+        self.message_user(request, f'{updated} mensaje(s) marcado(s) como leido(s).')
 
-    @admin.action(description='● Marcar seleccionados como NO leídos')
+    @admin.action(description='Marcar seleccionados como NO leidos')
     def marcar_no_leido(self, request, queryset):
         updated = queryset.update(leido=False)
-        self.message_user(request, f'{updated} mensaje(s) marcado(s) como NO leído(s).')
+        self.message_user(request, f'{updated} mensaje(s) marcado(s) como NO leido(s).')
 
     def get_form(self, request, obj=None, **kwargs):
         # Auto-marcar como leído al abrir el detalle (si no lo estaba)
@@ -88,17 +90,21 @@ class SolicitudCitaAdmin(ModelAdmin):
     search_fields = ('nombre', 'apellido', 'email', 'telefono')
     readonly_fields = ('recibido_en',)
     date_hierarchy = 'fecha_preferida'
+    ordering = ('-recibido_en',)
     actions = ['confirmar_citas', 'cancelar_citas']
     save_on_top = True
 
     fieldsets = (
-        ('Cliente', {
+        ('Datos del cliente', {
+            'description': 'Persona que solicitó la cita desde el formulario del sitio.',
             'fields': ('nombre', 'apellido', 'email', 'telefono'),
         }),
         ('Cita solicitada', {
+            'description': 'Fecha, tipo de cita y mensaje opcional que dejó el cliente.',
             'fields': ('tipo', 'fecha_preferida', 'mensaje'),
         }),
         ('Seguimiento', {
+            'description': 'Cambiá el estado a "Confirmada" cuando ya hayas agendado la reunión con el cliente.',
             'fields': ('estado', 'recibido_en'),
         }),
     )
@@ -110,12 +116,10 @@ class SolicitudCitaAdmin(ModelAdmin):
     @admin.display(description='Tipo', ordering='tipo')
     def tipo_badge(self, obj):
         colores = {'presencial': '#0ea5e9', 'virtual': '#8b5cf6'}
-        iconos = {'presencial': '🏢', 'virtual': '💻'}
         color = colores.get(obj.tipo, '#6b7280')
-        icono = iconos.get(obj.tipo, '')
         return format_html(
-            '<span style="background:{};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">{} {}</span>',
-            color, icono, obj.get_tipo_display(),
+            '<span style="background:{};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">{}</span>',
+            color, obj.get_tipo_display(),
         )
 
     @admin.display(description='Estado', ordering='estado')
@@ -131,12 +135,12 @@ class SolicitudCitaAdmin(ModelAdmin):
             color, obj.get_estado_display(),
         )
 
-    @admin.action(description='✓ Confirmar citas seleccionadas')
+    @admin.action(description='Confirmar citas seleccionadas')
     def confirmar_citas(self, request, queryset):
         updated = queryset.filter(estado='pendiente').update(estado='confirmada')
         self.message_user(request, f'{updated} cita(s) confirmada(s).')
 
-    @admin.action(description='✗ Cancelar citas seleccionadas')
+    @admin.action(description='Cancelar citas seleccionadas')
     def cancelar_citas(self, request, queryset):
         updated = queryset.exclude(estado='cancelada').update(estado='cancelada')
         self.message_user(request, f'{updated} cita(s) cancelada(s).')
