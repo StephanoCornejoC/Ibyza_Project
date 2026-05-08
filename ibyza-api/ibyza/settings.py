@@ -216,6 +216,7 @@ REST_FRAMEWORK = {
     'DEFAULT_THROTTLE_RATES': {
         'anon': '100/min',
         'datos_bancarios': '5/min',
+        'avance_comprador': '20/min',
     },
 }
 

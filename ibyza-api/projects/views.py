@@ -10,7 +10,7 @@ from .models import Proyecto, Departamento, AvanceDeObra
 from .serializers import (
     ProyectoListSerializer, ProyectoDetailSerializer,
     DepartamentoSerializer, DepartamentoDisponibleSerializer, AvanceSerializer,
-    DatosBancariosSerializer,
+    AvanceCompradorSerializer, DatosBancariosSerializer,
 )
 
 
@@ -103,3 +103,48 @@ class DatosBancariosView(APIView):
             )
         proyecto = get_object_or_404(Proyecto, slug=slug, activo=True)
         return Response(DatosBancariosSerializer(proyecto).data)
+
+
+class AvanceCompradorThrottle(AnonRateThrottle):
+    """Throttle para el endpoint de avance por código.
+
+    Limita el scraping de códigos de acceso por fuerza bruta. La tasa la
+    define DEFAULT_THROTTLE_RATES['avance_comprador'] en settings.
+    """
+    scope = 'avance_comprador'
+
+
+class AvancePorCodigoView(APIView):
+    """GET /api/avance/<codigo>/
+
+    Devuelve la info del proyecto + departamento + avances de obra del
+    proyecto al que pertenece. Acceso público con código (sin login).
+    """
+    permission_classes = []
+    throttle_classes = [AvanceCompradorThrottle]
+
+    def get(self, request, codigo):
+        try:
+            depto = Departamento.objects.select_related(
+                'nivel__proyecto'
+            ).get(codigo_acceso=codigo, codigo_activo=True)
+        except Departamento.DoesNotExist:
+            return Response(
+                {'detail': 'Código inválido o expirado.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        proyecto = depto.nivel.proyecto
+        avances = AvanceDeObra.objects.filter(
+            proyecto=proyecto, publicado=True,
+        ).order_by('-fecha')
+
+        serializer = AvanceCompradorSerializer(
+            {
+                'proyecto': proyecto,
+                'departamento': depto,
+                'avances': avances,
+            },
+            context={'request': request},
+        )
+        return Response(serializer.data)

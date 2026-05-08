@@ -1,5 +1,22 @@
+import secrets
+import string
+
 from django.db import models
 from django.utils.text import slugify
+
+
+def _generar_codigo_acceso(slug_proyecto, codigo_depto):
+    """Genera un código único legible: SLUG-CODIGO-RAND4.
+
+    Ejemplo: 'BOL-901-X7Y2'. El sufijo aleatorio usa un alfabeto sin
+    caracteres ambiguos (sin O, 0, I, 1, etc. queda fuera del scope; usamos
+    [A-Z0-9] que ya da 36^4 = ~1.7M combinaciones por par slug+codigo).
+    """
+    slug_short = (slug_proyecto or 'IBY')[:3].upper()
+    rand = ''.join(
+        secrets.choice(string.ascii_uppercase + string.digits) for _ in range(4)
+    )
+    return f'{slug_short}-{codigo_depto}-{rand}'
 
 
 class Proyecto(models.Model):
@@ -177,10 +194,43 @@ class Departamento(models.Model):
         help_text='Plano específico de este departamento. Si lo dejas vacío, se usará el plano del nivel.',
     )
 
+    # ─── Acceso del comprador al avance de obra ───────────────────────────
+    codigo_acceso = models.CharField(
+        'Código de acceso del comprador',
+        max_length=20, unique=True, blank=True, null=True,
+        db_index=True,
+        help_text='Código autogenerado para que el comprador vea el avance de obra. '
+                  'Compártelo con el cliente cuando se confirme la venta.',
+    )
+    codigo_activo = models.BooleanField(
+        'Código activo',
+        default=True,
+        help_text='Desmarca para revocar el acceso del comprador (ej: si rescindió la venta).',
+    )
+
     class Meta:
         verbose_name = 'Departamento'
         verbose_name_plural = 'Departamentos'
         ordering = ['nivel__numero', 'codigo']
+
+    def save(self, *args, **kwargs):
+        # Auto-generar código de acceso cuando el depto pasa a separado/vendido
+        # y aún no tiene código. Reintenta hasta 5 veces ante colisiones del
+        # sufijo aleatorio (4 chars alfanuméricos = ~1.7M combinaciones).
+        if (
+            not self.codigo_acceso
+            and self.estado in ('separado', 'vendido')
+            and self.nivel_id
+        ):
+            slug = self.nivel.proyecto.slug if self.nivel.proyecto else 'IBY'
+            for _ in range(5):
+                candidato = _generar_codigo_acceso(slug, self.codigo)
+                if not Departamento.objects.filter(
+                    codigo_acceso=candidato
+                ).exclude(pk=self.pk).exists():
+                    self.codigo_acceso = candidato
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.nivel.proyecto} — Depto {self.codigo}'

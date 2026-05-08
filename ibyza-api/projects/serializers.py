@@ -93,6 +93,42 @@ class ProyectoDetailSerializer(serializers.ModelSerializer):
                   'niveles', 'avances', 'videos', 'galeria']
 
 
+class AvanceCompradorSerializer(serializers.Serializer):
+    """Serializer del endpoint público por código de acceso del comprador.
+
+    Recibe un dict con keys: proyecto, departamento, avances.
+    """
+    proyecto = serializers.SerializerMethodField()
+    departamento = serializers.SerializerMethodField()
+    avances = AvanceSerializer(many=True, read_only=True)
+
+    def get_proyecto(self, obj):
+        p = obj['proyecto']
+        request = self.context.get('request') if hasattr(self, 'context') else None
+        fachada = p.imagen_fachada.url if p.imagen_fachada else None
+        if fachada and request:
+            fachada = request.build_absolute_uri(fachada)
+        return {
+            'nombre': p.nombre,
+            'slug': p.slug,
+            'ubicacion': p.ubicacion,
+            'imagen_fachada': fachada,
+            'estado': p.estado,
+            'estado_display': p.get_estado_display(),
+        }
+
+    def get_departamento(self, obj):
+        d = obj['departamento']
+        return {
+            'codigo': d.codigo,
+            'tipo': d.tipo,
+            'tipo_display': d.get_tipo_display(),
+            'area_total': str(d.area_total),
+            'area_techada': str(d.area_techada),
+            'piso': d.nivel.numero if d.nivel else None,
+        }
+
+
 class DatosBancariosSerializer(serializers.ModelSerializer):
     """Datos bancarios de la empresa receptora del proyecto.
 

@@ -14,6 +14,7 @@ const ProjectsPage = lazy(() => import('@/features/projects/ProjectsPage'));
 const ProjectDetailPage = lazy(() => import('@/features/projects/ProjectDetailPage'));
 const ContactPage = lazy(() => import('@/features/contact/ContactPage'));
 const SeparacionPage = lazy(() => import('@/features/separation/SeparacionPage'));
+const AvancePage = lazy(() => import('@/features/avance/AvancePage'));
 const NotFoundPage = lazy(() => import('@/features/not-found/NotFoundPage'));
 
 /**
@@ -60,6 +61,17 @@ const router = createBrowserRouter([
       title: 'Separar departamento',
       description: 'Separa tu departamento disponible con Culqi o transferencia bancaria.',
     }),
+  },
+  {
+    path: ROUTES.AVANCE,
+    element: withLayout(AvancePage, {
+      title: 'Avance de obra',
+      description: 'Consulta el avance de obra de tu departamento con tu código de comprador.',
+    }),
+  },
+  {
+    path: ROUTES.AVANCE_CODIGO,
+    element: withLayout(AvancePage),
   },
   {
     path: ROUTES.CONTACT,

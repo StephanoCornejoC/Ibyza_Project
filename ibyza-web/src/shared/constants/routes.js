@@ -8,6 +8,8 @@ export const ROUTES = {
   PROJECTS: '/proyectos',
   PROJECT_DETAIL: '/proyectos/:slug',
   SEPARACION: '/separacion',
+  AVANCE: '/avance',
+  AVANCE_CODIGO: '/avance/:codigo',
   CONTACT: '/contacto',
 };
 
@@ -16,3 +18,9 @@ export const ROUTES = {
  * Uso: buildProjectDetailRoute('proyecto-miraflores')
  */
 export const buildProjectDetailRoute = (slug) => `/proyectos/${slug}`;
+
+/**
+ * Helper para construir la ruta de avance con código.
+ * Uso: buildAvanceRoute('ABC-123-XYZ9')
+ */
+export const buildAvanceRoute = (codigo) => `/avance/${encodeURIComponent(codigo)}`;

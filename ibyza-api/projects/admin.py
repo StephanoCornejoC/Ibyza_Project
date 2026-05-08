@@ -153,14 +153,16 @@ class NivelAdmin(ModelAdmin):
 class DepartamentoAdmin(ModelAdmin):
     list_display = (
         'codigo', 'get_proyecto', 'get_nivel', 'tipo',
-        'area_total', 'precio_formato', 'estado_badge',
+        'area_total', 'precio_formato', 'estado_badge', 'codigo_acceso_display',
     )
-    list_filter = ('estado', 'tipo', 'nivel__proyecto')
-    search_fields = ('codigo', 'nivel__proyecto__nombre')
+    list_filter = ('estado', 'tipo', 'nivel__proyecto', 'codigo_activo')
+    search_fields = ('codigo', 'nivel__proyecto__nombre', 'codigo_acceso')
     list_editable = ()
     autocomplete_fields = ('nivel',)
     ordering = ('nivel__proyecto__nombre', 'nivel__numero', 'codigo')
     save_on_top = True
+    readonly_fields = ('codigo_acceso',)
+    actions = ('regenerar_codigo_acceso',)
 
     fieldsets = (
         ('Ubicación dentro del proyecto', {
@@ -173,6 +175,13 @@ class DepartamentoAdmin(ModelAdmin):
         ('Estado y descripción', {
             'description': 'El estado se actualiza automáticamente cuando un cliente separa el departamento.',
             'fields': ('estado', 'descripcion', 'imagen_planta'),
+        }),
+        ('Acceso del comprador', {
+            'classes': ('collapse',),
+            'description': 'Cuando el departamento se marque como "separado" o "vendido" se generará '
+                           'un código único. Compártelo con el comprador para que pueda ver el avance '
+                           'de obra de su proyecto en /avance/<código>.',
+            'fields': ('codigo_acceso', 'codigo_activo'),
         }),
     )
 
@@ -199,6 +208,36 @@ class DepartamentoAdmin(ModelAdmin):
         return format_html(
             '<span style="background:{};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600">{}</span>',
             color, obj.get_estado_display(),
+        )
+
+    @admin.display(description='Código de acceso', ordering='codigo_acceso')
+    def codigo_acceso_display(self, obj):
+        if not obj.codigo_acceso:
+            return mark_safe('<span style="color:#9ca3af">—</span>')
+        if not obj.codigo_activo:
+            return format_html(
+                '<code style="font-family:monospace;background:#fee2e2;color:#991b1b;'
+                'padding:2px 6px;border-radius:4px;text-decoration:line-through">{}</code>',
+                obj.codigo_acceso,
+            )
+        return format_html(
+            '<code style="font-family:monospace;background:#f3f4f6;color:#111827;'
+            'padding:2px 6px;border-radius:4px">{}</code>',
+            obj.codigo_acceso,
+        )
+
+    @admin.action(description='Regenerar código de acceso')
+    def regenerar_codigo_acceso(self, request, queryset):
+        regenerados = 0
+        for depto in queryset:
+            depto.codigo_acceso = None
+            depto.save()
+            if depto.codigo_acceso:
+                regenerados += 1
+        self.message_user(
+            request,
+            f'Se regeneraron {regenerados} código(s) de acceso. '
+            f'Recordá que solo se generan si el estado es "separado" o "vendido".',
         )
 
 

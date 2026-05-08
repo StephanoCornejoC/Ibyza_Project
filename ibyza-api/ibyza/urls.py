@@ -9,7 +9,7 @@ from content.views import (
     TestimoniosView,
     BeneficiosView,
 )
-from projects.views import DepartamentosDisponiblesView
+from projects.views import DepartamentosDisponiblesView, AvancePorCodigoView
 from .views import healthz
 
 urlpatterns = [
@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/proyectos/', include('projects.urls')),
     path('api/departamentos/disponibles/', DepartamentosDisponiblesView.as_view(), name='deptos-disponibles'),
+    path('api/avance/<str:codigo>/', AvancePorCodigoView.as_view(), name='avance-por-codigo'),
     path('api/contacto/', include('contact.urls')),
     path('api/pagos/', include('payments.urls')),
     path('api/contenido/', include('content.urls')),

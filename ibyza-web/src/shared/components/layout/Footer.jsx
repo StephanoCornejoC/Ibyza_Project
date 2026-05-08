@@ -64,6 +64,8 @@ export const Footer = () => {
             <FooterLink as={Link} to={ROUTES.HOME}>Inicio</FooterLink>
             <FooterLink as={Link} to={ROUTES.ABOUT}>Nosotros</FooterLink>
             <FooterLink as={Link} to={ROUTES.PROJECTS}>Proyectos</FooterLink>
+            <FooterLink as={Link} to={ROUTES.SEPARACION}>Separar departamento</FooterLink>
+            <FooterLink as={Link} to={ROUTES.AVANCE}>Avance de tu compra</FooterLink>
             <FooterLink as={Link} to={ROUTES.CONTACT}>Contacto</FooterLink>
           </FooterLinks>
         </FooterSection>
