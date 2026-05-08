@@ -10,6 +10,13 @@ class Separacion(models.Model):
     METODO_PAGO_CHOICES = [
         ('culqi', 'Tarjeta (Culqi)'),
         ('transferencia', 'Transferencia bancaria'),
+        ('efectivo', 'Efectivo'),
+        ('cheque', 'Cheque'),
+        ('otro', 'Otro'),
+    ]
+    ORIGEN_CHOICES = [
+        ('web', 'Formulario público'),
+        ('admin', 'Registro manual (admin)'),
     ]
 
     departamento = models.ForeignKey(
@@ -31,16 +38,30 @@ class Separacion(models.Model):
     metodo_pago = models.CharField(
         'Método de pago usado', max_length=20,
         choices=METODO_PAGO_CHOICES, default='culqi',
-        help_text='Tarjeta (Culqi) se aprueba automáticamente. Transferencia requiere tu aprobación manual.',
+        help_text='Tarjeta (Culqi) se aprueba automáticamente. Transferencia, efectivo y cheque requieren aprobación manual.',
+    )
+    origen = models.CharField(
+        'Origen del registro', max_length=10,
+        choices=ORIGEN_CHOICES, default='web',
+        help_text='Indica si la separación entró por la web pública o se registró manualmente desde el admin.',
+        db_index=True,
     )
     culqi_charge_id = models.CharField(
         'ID de transacción Culqi', max_length=200, blank=True,
         help_text='Solo lectura. Se llena automáticamente cuando el pago es con tarjeta.',
     )
+    numero_operacion = models.CharField(
+        'N° de operación / referencia', max_length=100, blank=True,
+        help_text='Número de operación bancaria, voucher de efectivo o referencia del cheque.',
+    )
     comprobante = models.ImageField(
-        'Comprobante de transferencia',
+        'Comprobante de pago',
         upload_to='comprobantes/', blank=True, null=True,
-        help_text='El comprador sube esta imagen desde la web. Solo aplica si pagó por transferencia.',
+        help_text='Imagen del voucher, comprobante de transferencia o cheque.',
+    )
+    notas_admin = models.TextField(
+        'Notas internas (solo admin)', blank=True,
+        help_text='Notas privadas para el equipo. No se muestran al comprador.',
     )
     estado = models.CharField(
         'Estado de la separación', max_length=20,

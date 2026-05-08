@@ -54,6 +54,7 @@ class SeparacionView(APIView):
                     status=status.HTTP_409_CONFLICT,
                 )
 
+            # origen='web' SIEMPRE — no confiar en lo que mande el frontend.
             separacion = Separacion.objects.create(
                 departamento=departamento,
                 nombre=data['nombre'],
@@ -62,6 +63,8 @@ class SeparacionView(APIView):
                 telefono=data['telefono'],
                 dni=data['dni'],
                 monto=data['monto'],
+                metodo_pago='culqi',
+                origen='web',
                 estado='pendiente',
             )
             try:
@@ -138,6 +141,7 @@ class SeparacionTransferenciaView(APIView):
                     status=status.HTTP_409_CONFLICT,
                 )
 
+            # origen='web' SIEMPRE — no confiar en lo que mande el frontend.
             separacion = Separacion.objects.create(
                 departamento=departamento,
                 nombre=data['nombre'],
@@ -147,6 +151,7 @@ class SeparacionTransferenciaView(APIView):
                 dni=data['dni'],
                 monto=data['monto'],
                 metodo_pago='transferencia',
+                origen='web',
                 comprobante=data['comprobante'],
                 estado='pendiente',
             )

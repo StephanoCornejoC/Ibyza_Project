@@ -32,11 +32,24 @@ class NivelInline(TabularInline):
 
 
 class DepartamentoInline(TabularInline):
+    """Listado de Departamentos dentro de un Nivel.
+
+    El estado es READONLY: solo se cambia creando/editando una Separación.
+    Los deptos nuevos se crean siempre con estado 'disponible' (default
+    del modelo).
+    """
     model = Departamento
     extra = 0
-    fields = ('codigo', 'tipo', 'area_total', 'area_techada', 'precio', 'estado')
+    fields = ('codigo', 'tipo', 'area_total', 'area_techada', 'precio', 'estado_display')
+    readonly_fields = ('estado_display',)
     verbose_name = 'Departamento'
     verbose_name_plural = 'Departamentos de este piso'
+
+    @admin.display(description='Estado')
+    def estado_display(self, obj):
+        if not obj or not obj.pk:
+            return '—'
+        return obj.get_estado_display()
 
 
 # ─── Proyecto ───────────────────────────────────────────────────────────────
@@ -161,7 +174,7 @@ class DepartamentoAdmin(ModelAdmin):
     autocomplete_fields = ('nivel',)
     ordering = ('nivel__proyecto__nombre', 'nivel__numero', 'codigo')
     save_on_top = True
-    readonly_fields = ('codigo_acceso',)
+    readonly_fields = ('codigo_acceso', 'estado')
     actions = ('regenerar_codigo_acceso',)
 
     fieldsets = (
@@ -172,9 +185,15 @@ class DepartamentoAdmin(ModelAdmin):
         ('Áreas y precio', {
             'fields': ('area_total', 'area_techada', 'precio'),
         }),
-        ('Estado y descripción', {
-            'description': 'El estado se actualiza automáticamente cuando un cliente separa el departamento.',
-            'fields': ('estado', 'descripcion', 'imagen_planta'),
+        ('Estado de venta (gestionado por separaciones)', {
+            'description': (
+                'El estado se actualiza automáticamente según las separaciones registradas. '
+                'Para cambiarlo, registrá una separación en "Separaciones recibidas".'
+            ),
+            'fields': ('estado',),
+        }),
+        ('Descripción y plano', {
+            'fields': ('descripcion', 'imagen_planta'),
         }),
         ('Acceso del comprador', {
             'classes': ('collapse',),
@@ -184,6 +203,13 @@ class DepartamentoAdmin(ModelAdmin):
             'fields': ('codigo_acceso', 'codigo_activo'),
         }),
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        """`estado` siempre readonly: se gestiona vía Separaciones."""
+        base = list(super().get_readonly_fields(request, obj))
+        if 'estado' not in base:
+            base.append('estado')
+        return base
 
     @admin.display(description='Proyecto', ordering='nivel__proyecto__nombre')
     def get_proyecto(self, obj):

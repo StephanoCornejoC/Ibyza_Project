@@ -13,12 +13,15 @@ class SeparacionAdmin(ModelAdmin):
         'departamento_link',
         'monto_formato',
         'metodo_badge',
+        'origen_badge',
         'tiene_comprobante',
         'registrado_en',
     )
     list_display_links = ('nombre_completo',)
-    list_filter = ('estado', 'metodo_pago', 'registrado_en')
-    search_fields = ('nombre', 'apellido', 'dni', 'email', 'telefono')
+    list_filter = ('estado', 'metodo_pago', 'origen', 'registrado_en')
+    search_fields = (
+        'nombre', 'apellido', 'dni', 'email', 'telefono', 'numero_operacion',
+    )
     readonly_fields = (
         'culqi_charge_id', 'error', 'registrado_en',
         'comprobante_preview',
@@ -29,7 +32,7 @@ class SeparacionAdmin(ModelAdmin):
 
     fieldsets = (
         ('Datos del comprador', {
-            'description': 'Cliente que realizó la separación. El departamento se asocia automáticamente desde el formulario web.',
+            'description': 'Cliente que realizó la separación. El departamento se asocia automáticamente desde el formulario web o se elige al registrar manualmente.',
             'fields': (
                 'departamento',
                 ('nombre', 'apellido'),
@@ -37,20 +40,45 @@ class SeparacionAdmin(ModelAdmin):
                 ('dni', 'monto'),
             ),
         }),
-        ('Información de pago', {
-            'description': 'Pagos con tarjeta (Culqi) se aprueban automáticamente. Las transferencias requieren tu aprobación manual desde la lista (acción "Aprobar transferencia").',
+        ('Método y monto', {
+            'description': (
+                'Tarjeta (Culqi) se aprueba automáticamente. Transferencia, '
+                'efectivo y cheque requieren aprobación manual desde la lista '
+                '(acción "Aprobar transferencia").'
+            ),
             'fields': (
                 ('metodo_pago', 'estado'),
+                ('origen', 'numero_operacion'),
                 'culqi_charge_id',
-                'comprobante',
-                'comprobante_preview',
-                'error',
             ),
         }),
-        ('Registro', {
-            'fields': ('registrado_en',),
+        ('Comprobante', {
+            'description': (
+                'Adjuntá el voucher, comprobante de transferencia, foto de '
+                'recibo de efectivo o imagen del cheque. No aplica para Culqi '
+                '(ya tiene su ID de transacción).'
+            ),
+            'fields': (
+                'comprobante',
+                'comprobante_preview',
+            ),
+        }),
+        ('Notas internas', {
+            'classes': ('collapse',),
+            'description': 'Notas privadas del equipo. No se muestran al comprador.',
+            'fields': ('notas_admin',),
+        }),
+        ('Diagnóstico', {
+            'classes': ('collapse',),
+            'fields': ('error', 'registrado_en'),
         }),
     )
+
+    def get_changeform_initial_data(self, request):
+        """Cuando Diana crea una Separación desde admin, origen='admin' por default."""
+        initial = super().get_changeform_initial_data(request)
+        initial.setdefault('origen', 'admin')
+        return initial
 
     @admin.display(description='Cliente')
     def nombre_completo(self, obj):
@@ -88,6 +116,9 @@ class SeparacionAdmin(ModelAdmin):
         config = {
             'culqi': ('#6366f1', 'Tarjeta'),
             'transferencia': ('#0ea5e9', 'Transferencia'),
+            'efectivo': ('#16a34a', 'Efectivo'),
+            'cheque': ('#a855f7', 'Cheque'),
+            'otro': ('#6b7280', 'Otro'),
         }
         color, label = config.get(obj.metodo_pago, ('#6b7280', obj.metodo_pago))
         return format_html(
@@ -95,9 +126,22 @@ class SeparacionAdmin(ModelAdmin):
             color, label,
         )
 
+    @admin.display(description='Origen', ordering='origen')
+    def origen_badge(self, obj):
+        config = {
+            'web': ('#0ea5e9', 'Web'),
+            'admin': ('#7c3aed', 'Admin'),
+        }
+        color, label = config.get(obj.origen, ('#6b7280', obj.origen))
+        return format_html(
+            '<span style="background:{};color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">{}</span>',
+            color, label,
+        )
+
     @admin.display(description='Comprobante')
     def tiene_comprobante(self, obj):
-        if obj.metodo_pago != 'transferencia':
+        # Culqi no necesita comprobante (tiene culqi_charge_id como evidencia).
+        if obj.metodo_pago == 'culqi':
             return mark_safe('<span style="color:#9ca3af">N/A</span>')
         if obj.comprobante:
             return format_html(
@@ -118,37 +162,56 @@ class SeparacionAdmin(ModelAdmin):
             )
         return mark_safe('<span style="color:#9ca3af">Sin comprobante</span>')
 
-    @admin.action(description='Aprobar transferencia (marca depto como SEPARADO)')
+    # Métodos manuales que requieren aprobación humana (no Culqi).
+    METODOS_MANUALES = ('transferencia', 'efectivo', 'cheque', 'otro')
+
+    @admin.action(description='Aprobar separación manual (marca depto como SEPARADO)')
     def aprobar_transferencia(self, request, queryset):
-        elegibles = queryset.filter(estado='pendiente', metodo_pago='transferencia')
+        elegibles = queryset.filter(
+            estado='pendiente', metodo_pago__in=self.METODOS_MANUALES,
+        )
         descartadas = queryset.count() - elegibles.count()
         updated = 0
         for sep in elegibles:
             sep.estado = 'completado'
+            # El signal post_save sincroniza el estado del Departamento.
             sep.save(update_fields=['estado'])
-            sep.departamento.estado = 'separado'
-            sep.departamento.save(update_fields=['estado'])
             updated += 1
-        msg = f'{updated} separación(es) aprobada(s) y departamento(s) marcado(s) como SEPARADO.'
+        msg = (
+            f'{updated} separación(es) aprobada(s) y departamento(s) marcado(s) '
+            'como SEPARADO.'
+        )
         if descartadas:
-            msg += f' ({descartadas} ignorada(s) por no ser transferencias pendientes.)'
+            msg += (
+                f' ({descartadas} ignorada(s) por no ser separaciones manuales '
+                'pendientes.)'
+            )
         self.message_user(request, msg)
 
-    @admin.action(description='Rechazar transferencia (libera el departamento)')
+    @admin.action(description='Rechazar separación manual (libera el departamento)')
     def rechazar_transferencia(self, request, queryset):
         from django.contrib import messages
         if 'apply' not in request.POST:
             # Mostrar confirmación
             from django.template.response import TemplateResponse
-            elegibles = queryset.filter(estado='pendiente', metodo_pago='transferencia')
+            elegibles = queryset.filter(
+                estado='pendiente', metodo_pago__in=self.METODOS_MANUALES,
+            )
             return TemplateResponse(request, 'admin/payments/confirmar_rechazo.html', {
                 'separaciones': elegibles,
                 'queryset': queryset,
                 'action': 'rechazar_transferencia',
                 'opts': self.model._meta,
             })
-        elegibles = queryset.filter(estado='pendiente', metodo_pago='transferencia')
-        updated = elegibles.update(estado='fallido')
+        elegibles = queryset.filter(
+            estado='pendiente', metodo_pago__in=self.METODOS_MANUALES,
+        )
+        # Iteramos para que dispare el signal y recalcule el estado del depto.
+        updated = 0
+        for sep in elegibles:
+            sep.estado = 'fallido'
+            sep.save(update_fields=['estado'])
+            updated += 1
         self.message_user(
             request,
             f'{updated} separación(es) rechazada(s).',
