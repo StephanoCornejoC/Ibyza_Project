@@ -12,7 +12,7 @@ from pathlib import Path
 from django.conf import settings
 from django.core.files import File
 from django.core.management.base import BaseCommand
-from projects.models import Proyecto, Nivel, Departamento, AvanceDeObra, VideoProyecto
+from projects.models import Proyecto, Nivel, Departamento, AvanceDeObra, VideoProyecto, ImagenGaleria
 
 
 # Departamentos disponibles iniciales por slug de proyecto.
@@ -246,6 +246,38 @@ class Command(BaseCommand):
             proyecto.imagen_fachada.save(fachada_path.name, File(f), save=True)
         return True
 
+    def _cargar_galeria(self, proyecto):
+        """
+        Sube las imagenes de seed_assets/proyectos/<slug>/galeria/ como
+        ImagenGaleria si todavia no hay galeria cargada para este proyecto.
+
+        Idempotente: si ya hay imagenes (por ejemplo, Diana subio nuevas
+        desde el admin), NO toca nada.
+        """
+        galeria_dir = Path(settings.BASE_DIR) / 'seed_assets' / 'proyectos' / proyecto.slug / 'galeria'
+        if not galeria_dir.exists():
+            return 0
+
+        # Si ya hay galeria, respetamos lo que Diana haya cargado
+        if ImagenGaleria.objects.filter(proyecto=proyecto).exists():
+            return 0
+
+        archivos = sorted(galeria_dir.glob('img-*.png'))
+        if not archivos:
+            return 0
+
+        cargadas = 0
+        for idx, ruta in enumerate(archivos, start=1):
+            img = ImagenGaleria(
+                proyecto=proyecto,
+                descripcion=f'{proyecto.nombre} - foto {idx}',
+                orden=idx,
+            )
+            with open(ruta, 'rb') as f:
+                img.imagen.save(ruta.name, File(f), save=True)
+            cargadas += 1
+        return cargadas
+
     def handle(self, *args, **options):
         if options['clear']:
             self.stdout.write(self.style.WARNING('Eliminando proyectos existentes...'))
@@ -254,6 +286,7 @@ class Command(BaseCommand):
         created_count = 0
         skipped_count = 0
         fachadas_cargadas = 0
+        galeria_total = 0
 
         for data in PROYECTOS:
             videos = data.pop('videos', [])
@@ -278,6 +311,15 @@ class Command(BaseCommand):
                 fachadas_cargadas += 1
                 self.stdout.write(self.style.SUCCESS(
                     f'    fachada cargada desde seed_assets'
+                ))
+
+            # Cargar galeria si todavia no hay imagenes (preserva lo que
+            # Diana haya cargado desde el admin).
+            galerias_cargadas = self._cargar_galeria(proyecto)
+            if galerias_cargadas > 0:
+                galeria_total += galerias_cargadas
+                self.stdout.write(self.style.SUCCESS(
+                    f'    galeria cargada: {galerias_cargadas} fotos'
                 ))
 
             # Videos: get_or_create por (proyecto, youtube_url)
@@ -319,11 +361,12 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(
             f'Seed completado: {created_count} creados, '
             f'{skipped_count} ya existian (no tocados), '
-            f'{fachadas_cargadas} fachadas cargadas desde seed_assets.'
+            f'{fachadas_cargadas} fachadas cargadas, '
+            f'{galeria_total} fotos de galeria cargadas desde seed_assets.'
         ))
         self.stdout.write(self.style.WARNING(
-            'NOTA: Las imagenes de galeria, planos y catalogo PDF se cargan '
-            'desde el panel de administracion Django.'
+            'NOTA: Los planos de planta y catalogo PDF se cargan desde el '
+            'panel de administracion Django.'
         ))
         self.stdout.write(self.style.WARNING(
             'NOTA: Los departamentos individuales con metrajes y precios deben '
