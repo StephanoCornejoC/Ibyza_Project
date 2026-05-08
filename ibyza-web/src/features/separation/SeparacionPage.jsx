@@ -210,7 +210,8 @@ const SeparacionPage = () => {
 
 const Hero = styled.section`
   position: relative;
-  height: 100dvh;
+  height: 100vh;
+  height: 100svh; /* small viewport height: estable en mobile, evita reflow del background al hacer scroll */
   min-height: 600px;
   background-color: ${({ theme }) => theme.colors.deepBg};
   background-image: url(${heroBg});

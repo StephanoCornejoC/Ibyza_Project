@@ -113,7 +113,8 @@ const StatCardAnimated = ({ value, suffix, label }) => {
 
 const HeroSection = styled.section`
   position: relative;
-  height: 100dvh;
+  height: 100vh;
+  height: 100svh; /* small viewport height: estable en mobile, evita reflow del background al hacer scroll */
   display: flex;
   flex-direction: column;
   justify-content: center;

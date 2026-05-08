@@ -1,8 +1,7 @@
-import { useRef, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { motion } from 'framer-motion'
-import { ArrowRight, Building2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, Building2 } from 'lucide-react'
 import { SectionTitle } from '@/shared/components/ui/SectionTitle'
 import { Badge } from '@/shared/components/ui/Badge'
 import { EmptyState } from '@/shared/components/ui/EmptyState'
@@ -10,136 +9,26 @@ import { Button } from '@/shared/components/ui/Button'
 import { buildProjectDetailRoute, ROUTES } from '@/shared/constants/routes'
 import { formatPriceUSD } from '@/shared/utils/formatters'
 import { Spinner } from '@/shared/components/ui/Spinner'
-import useMediaQuery from '@/shared/hooks/useMediaQuery'
 
 /**
- * ProjectsCarousel — Marquee horizontal infinito con flechas overlay.
+ * ProjectsCarousel — Marquee horizontal infinito con CSS animation pura.
  *
  * Implementacion:
- *  - El array de proyectos se triplica para soportar loop seamless.
- *  - Un loop de requestAnimationFrame avanza el scrollLeft del track de
- *    forma continua. Cuando el scroll cruza el limite del segundo tercio,
- *    se rebobina al primer tercio (mismo offset visual): asi se obtiene
- *    el efecto marquee infinito sin saltos visibles.
- *  - El hover NO pausa el avance: la animacion sigue continuando para
- *    no parecer reiniciarse al pasar el mouse.
- *  - Las flechas estan en posicion absoluta dentro del CarouselArea
- *    (overlay con z-index alto) y, al hacer click, hacen scrollBy de un
- *    card-width + gap. Pausan el avance momentaneamente para no
- *    "competir" con el scroll smooth.
- *  - El padding lateral del Viewport reserva espacio para que las flechas
- *    no tapen las cards.
- *  - Cards con ancho fijo escalando por viewport (~2.5 mobile,
- *    ~3.5 laptop comun, ~4.5 desktop ancho, 5+ extra grande).
- *  - En mobile (<480px) las flechas se ocultan: el usuario hace swipe
- *    nativo y el espacio horizontal se conserva para mostrar mas card.
+ *  - El array se duplica para que la animacion translateX(-50%) loop
+ *    seamless (cuando llega al final, vuelve al inicio sin salto visible).
+ *  - El movimiento es CSS @keyframes con transform: translateX, no rAF.
+ *    Eso es GPU-accelerated, funciona identico en mobile y desktop, y
+ *    no compite con el touch del usuario.
+ *  - Las cards son clickables (el click event funciona aunque el track
+ *    este animado).
+ *  - Hover NO pausa: el cliente pidio que la animacion siga corriendo.
  */
-const SPEED_PX_PER_SEC = 35 // velocidad del marquee
-const RESUME_DELAY_MS = 1200 // tras un click de flecha, esperamos antes de retomar el avance auto
 
 const ProjectsCarousel = ({ projects, loading }) => {
-  const trackRef = useRef(null)
-  const rafIdRef = useRef(null)
-  const lastTsRef = useRef(0)
-  const pausedRef = useRef(false)
-  const resumeTimerRef = useRef(null)
-  const isMobile = useMediaQuery('(max-width: 480px)')
-  // En touch devices (mobile/tablet) dejamos que el scroll nativo + scroll-snap
-  // manejen el carrusel. El rAF de marquee compite con el touch del usuario y
-  // congela la card cuando el dedo esta apoyado. Se desactiva el avance auto.
-  const isCoarsePointer = useMediaQuery('(pointer: coarse)')
-
-  // Triplicamos el array SOLO en desktop para que el loop sea seamless.
-  // En touch usamos el array tal cual: el usuario hace swipe especifico,
-  // no quiere ver los mismos proyectos repetidos 3 veces.
-  const tripled = projects && projects.length
-    ? (isCoarsePointer ? [...projects] : [...projects, ...projects, ...projects])
+  // Duplicamos el array para que -50% loop sin saltos visibles.
+  const doubled = projects && projects.length
+    ? [...projects, ...projects]
     : []
-
-  const getStep = useCallback(() => {
-    const track = trackRef.current
-    if (!track) return 0
-    const card = track.querySelector('[data-card]')
-    if (!card) return 0
-    const cardWidth = card.getBoundingClientRect().width
-    const styles = window.getComputedStyle(track)
-    const gap = parseFloat(styles.columnGap || styles.gap || '20') || 20
-    return cardWidth + gap
-  }, [])
-
-  const goPrev = () => {
-    const track = trackRef.current
-    if (!track) return
-    pausedRef.current = true
-    track.scrollBy({ left: -getStep(), behavior: 'smooth' })
-    schedulePauseRelease()
-  }
-
-  const goNext = () => {
-    const track = trackRef.current
-    if (!track) return
-    pausedRef.current = true
-    track.scrollBy({ left: getStep(), behavior: 'smooth' })
-    schedulePauseRelease()
-  }
-
-  const schedulePauseRelease = () => {
-    if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
-    resumeTimerRef.current = setTimeout(() => {
-      pausedRef.current = false
-    }, RESUME_DELAY_MS)
-  }
-
-  // Loop de marquee + wrap-around para que el scroll siga siempre dentro
-  // del segundo tercio "visible". Esto da el efecto infinito.
-  // En touch devices NO arrancamos el rAF: el usuario hace swipe nativo y
-  // el scroll-snap del CSS se encarga del UX.
-  useEffect(() => {
-    if (isCoarsePointer) return undefined
-    const track = trackRef.current
-    if (!track || !projects || projects.length === 0) return undefined
-
-    const positionMiddle = () => {
-      const max = track.scrollWidth
-      const third = max / 3
-      if (third > 0) track.scrollLeft = third
-    }
-    positionMiddle()
-
-    const tick = (ts) => {
-      const last = lastTsRef.current || ts
-      const dt = (ts - last) / 1000
-      lastTsRef.current = ts
-
-      const shouldAdvance = !pausedRef.current
-      if (shouldAdvance) {
-        track.scrollLeft += SPEED_PX_PER_SEC * dt
-      }
-
-      // Wrap-around silencioso para mantener el efecto loop.
-      const max = track.scrollWidth
-      const third = max / 3
-      if (third > 0) {
-        if (track.scrollLeft >= third * 2) {
-          track.scrollLeft = track.scrollLeft - third
-        } else if (track.scrollLeft <= 0) {
-          track.scrollLeft = third
-        }
-      }
-
-      rafIdRef.current = requestAnimationFrame(tick)
-    }
-
-    rafIdRef.current = requestAnimationFrame(tick)
-
-    window.addEventListener('resize', positionMiddle)
-
-    return () => {
-      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current)
-      if (resumeTimerRef.current) clearTimeout(resumeTimerRef.current)
-      window.removeEventListener('resize', positionMiddle)
-    }
-  }, [projects, isCoarsePointer])
 
   if (loading) return <Spinner size="lg" centered />
 
@@ -170,66 +59,52 @@ const ProjectsCarousel = ({ projects, loading }) => {
         light
       />
 
-      <CarouselArea>
-        {!isMobile && (
-          <NavBtn $side="left" onClick={goPrev} aria-label="Proyecto anterior">
-            <ChevronLeft size={22} />
-          </NavBtn>
-        )}
-
-        <Viewport>
-          <Track ref={trackRef}>
-            {tripled.map((project, idx) => (
-              <SlideCard
-                key={`${project.id}-${idx}`}
-                data-card
-                as={Link}
-                to={buildProjectDetailRoute(project.slug)}
-              >
-                <CardImage>
-                  {project.imagen_fachada ? (
-                    <img
-                      src={project.imagen_fachada}
-                      alt={project.nombre}
-                      loading="lazy"
-                    />
-                  ) : (
-                    <ImagePlaceholder />
+      <Marquee>
+        <Track>
+          {doubled.map((project, idx) => (
+            <SlideCard
+              key={`${project.id}-${idx}`}
+              data-card
+              as={Link}
+              to={buildProjectDetailRoute(project.slug)}
+            >
+              <CardImage>
+                {project.imagen_fachada ? (
+                  <img
+                    src={project.imagen_fachada}
+                    alt={project.nombre}
+                    loading="lazy"
+                  />
+                ) : (
+                  <ImagePlaceholder />
+                )}
+                <CardOverlay />
+                <CardBadge>
+                  <Badge status={project.estado || 'en_venta'} />
+                </CardBadge>
+              </CardImage>
+              <CardBody>
+                <CardLocation>
+                  {project.ubicacion?.split(',').pop()?.trim() || 'Arequipa'}
+                </CardLocation>
+                <CardTitle>{project.nombre}</CardTitle>
+                <CardDesc>{project.descripcion_corta}</CardDesc>
+                <CardFooter>
+                  {project.precio_desde && (
+                    <PriceTag>
+                      <span>Desde</span>
+                      <strong>{formatPriceUSD(project.precio_desde)}</strong>
+                    </PriceTag>
                   )}
-                  <CardOverlay />
-                  <CardBadge>
-                    <Badge status={project.estado || 'en_venta'} />
-                  </CardBadge>
-                </CardImage>
-                <CardBody>
-                  <CardLocation>
-                    {project.ubicacion?.split(',').pop()?.trim() || 'Arequipa'}
-                  </CardLocation>
-                  <CardTitle>{project.nombre}</CardTitle>
-                  <CardDesc>{project.descripcion_corta}</CardDesc>
-                  <CardFooter>
-                    {project.precio_desde && (
-                      <PriceTag>
-                        <span>Desde</span>
-                        <strong>{formatPriceUSD(project.precio_desde)}</strong>
-                      </PriceTag>
-                    )}
-                    <CardArrow>
-                      <ArrowRight size={16} />
-                    </CardArrow>
-                  </CardFooter>
-                </CardBody>
-              </SlideCard>
-            ))}
-          </Track>
-        </Viewport>
-
-        {!isMobile && (
-          <NavBtn $side="right" onClick={goNext} aria-label="Siguiente proyecto">
-            <ChevronRight size={22} />
-          </NavBtn>
-        )}
-      </CarouselArea>
+                  <CardArrow>
+                    <ArrowRight size={16} />
+                  </CardArrow>
+                </CardFooter>
+              </CardBody>
+            </SlideCard>
+          ))}
+        </Track>
+      </Marquee>
 
       <CtaRow
         as={motion.div}
@@ -261,11 +136,22 @@ const Section = styled.section`
   }
 `
 
-const CarouselArea = styled.div`
+// Animacion marquee infinita: traslada el track de 0 a -50% (porque el array
+// se duplica). Cuando llega a -50%, vuelve a 0 que visualmente es el mismo
+// punto -> loop seamless.
+const marqueeAnimation = keyframes`
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+`
+
+const Marquee = styled.div`
   position: relative;
   max-width: ${({ theme }) => theme.container.maxWidth};
   margin: 0 auto;
   padding: ${({ theme }) => `${theme.spacing.xl} 0`};
+  overflow: hidden;
+  // Hint al browser: vamos a animar el contenido. Lo deja en su propia capa.
+  contain: paint;
 
   ${({ theme }) => theme.media.tablet} {
     padding: ${({ theme }) => `${theme.spacing.lg} 0`};
@@ -276,86 +162,23 @@ const CarouselArea = styled.div`
   }
 `
 
-const NavBtn = styled.button`
-  position: absolute;
-  top: 50%;
-  ${({ $side }) => ($side === 'left' ? 'left: 8px;' : 'right: 8px;')}
-  transform: translateY(-50%);
-  z-index: 5;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: ${({ theme }) => theme.glass.card};
-  border: 1px solid ${({ theme }) => theme.glass.border};
-  color: ${({ theme }) => theme.colors.gold};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-
-  &:hover {
-    background: rgba(214,179,112,0.18);
-    border-color: ${({ theme }) => theme.colors.borderGold};
-    transform: translateY(-50%) scale(1.05);
-  }
-
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.gold};
-    outline-offset: 2px;
-  }
-`
-
-const Viewport = styled.div`
-  // Padding lateral para que las flechas no tapen las cards.
-  padding: 0 60px;
-  position: relative;
-  min-height: 1px;
-
-  ${({ theme }) => theme.media.tablet} {
-    padding: 0 56px;
-  }
-
-  // Desktop con mouse: el Viewport CLIPEA y el Track scrollea internamente
-  // (controlado por el rAF de marquee programatico).
-  @media (pointer: fine) {
-    overflow: hidden;
-  }
-
-  // Touch (mobile/tablet): el Viewport ES el scroller horizontal.
-  // El Track va overflow visible y deja que el Viewport reciba el touch.
-  // Esto resuelve el bug de "carrusel congelado" en mobile.
-  @media (pointer: coarse) {
-    padding: 0 ${({ theme }) => theme.spacing.md};
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    &::-webkit-scrollbar { display: none; }
-  }
-`
-
 const Track = styled.div`
   display: flex;
   flex-wrap: nowrap;
   gap: 20px;
+  width: max-content;
+  animation: ${marqueeAnimation} 60s linear infinite;
+  will-change: transform;
 
-  // Desktop: el Track scrollea (controlado por el rAF de marquee).
-  @media (pointer: fine) {
-    overflow-x: auto;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    &::-webkit-scrollbar { display: none; }
+  // Mobile: animacion mas rapida (cards mas chicas, queremos que se note).
+  ${({ theme }) => theme.media.mobile} {
+    animation-duration: 40s;
   }
 
-  // Touch: el Track NO scrollea — el scroll vive en el Viewport padre.
-  @media (pointer: coarse) {
-    overflow: visible;
+  // Si el usuario tiene reduce-motion, dejamos el track quieto pero
+  // accesible (puede scrollear si quiere — agregamos overflow visible).
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 `
 

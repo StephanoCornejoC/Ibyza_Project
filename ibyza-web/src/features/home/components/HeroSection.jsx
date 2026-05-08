@@ -179,7 +179,8 @@ const HeroSection = ({ content }) => {
 
 const HeroWrapper = styled.section`
   position: relative;
-  height: 100dvh;
+  height: 100vh;
+  height: 100svh; /* small viewport height: estable al ocultarse address bar mobile, evita reflow del background-image */
   display: flex;
   align-items: center;
   justify-content: center;
