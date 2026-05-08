@@ -25,7 +25,7 @@ class ContenidoWebView(generics.ListAPIView):
         return qs
 
 
-@method_decorator(cache_page(300), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class ConfiguracionSitioView(APIView):
     """GET /api/configuracion/ — Devuelve la configuración global del sitio."""
     def get(self, request):
@@ -34,7 +34,7 @@ class ConfiguracionSitioView(APIView):
         return Response(serializer.data)
 
 
-@method_decorator(cache_page(600), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class PreguntasFrecuentesView(generics.ListAPIView):
     """GET /api/faq/ — Lista de preguntas frecuentes publicadas."""
     serializer_class = PreguntaFrecuenteSerializer
@@ -42,7 +42,7 @@ class PreguntasFrecuentesView(generics.ListAPIView):
     pagination_class = None
 
 
-@method_decorator(cache_page(600), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class TestimoniosView(generics.ListAPIView):
     """GET /api/testimonios/ — Lista de testimonios publicados."""
     serializer_class = TestimonioSerializer
@@ -50,7 +50,7 @@ class TestimoniosView(generics.ListAPIView):
     pagination_class = None
 
 
-@method_decorator(cache_page(600), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class BeneficiosView(generics.ListAPIView):
     """GET /api/beneficios/ — Lista de beneficios publicados."""
     serializer_class = BeneficioSerializer

@@ -14,13 +14,13 @@ from .serializers import (
 )
 
 
-@method_decorator(cache_page(600), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class ProyectoListView(generics.ListAPIView):
     serializer_class = ProyectoListSerializer
     queryset = Proyecto.objects.filter(activo=True)
 
 
-@method_decorator(cache_page(600), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class ProyectoDetailView(generics.RetrieveAPIView):
     serializer_class = ProyectoDetailSerializer
     lookup_field = 'slug'
@@ -41,7 +41,7 @@ class DepartamentosView(generics.ListAPIView):
         )
 
 
-@method_decorator(cache_page(600), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class AvancesView(generics.ListAPIView):
     serializer_class = AvanceSerializer
 
@@ -52,7 +52,7 @@ class AvancesView(generics.ListAPIView):
         )
 
 
-@method_decorator(cache_page(120), name='dispatch')
+@method_decorator(cache_page(30), name='dispatch')
 class DepartamentosDisponiblesView(generics.ListAPIView):
     """
     GET /api/departamentos/disponibles/
