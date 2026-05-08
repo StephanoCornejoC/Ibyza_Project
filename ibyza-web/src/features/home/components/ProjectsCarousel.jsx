@@ -312,7 +312,6 @@ const NavBtn = styled.button`
 const Viewport = styled.div`
   // Padding lateral para que las flechas no tapen las cards.
   padding: 0 60px;
-  overflow: hidden;
   position: relative;
   min-height: 1px;
 
@@ -320,8 +319,24 @@ const Viewport = styled.div`
     padding: 0 56px;
   }
 
-  ${({ theme }) => theme.media.mobile} {
+  // Desktop con mouse: el Viewport CLIPEA y el Track scrollea internamente
+  // (controlado por el rAF de marquee programatico).
+  @media (pointer: fine) {
+    overflow: hidden;
+  }
+
+  // Touch (mobile/tablet): el Viewport ES el scroller horizontal.
+  // El Track va overflow visible y deja que el Viewport reciba el touch.
+  // Esto resuelve el bug de "carrusel congelado" en mobile.
+  @media (pointer: coarse) {
     padding: 0 ${({ theme }) => theme.spacing.md};
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar { display: none; }
   }
 `
 
@@ -329,22 +344,18 @@ const Track = styled.div`
   display: flex;
   flex-wrap: nowrap;
   gap: 20px;
-  overflow-x: auto;
 
-  // Ocultar la barra de scroll nativa (mantenemos la funcionalidad).
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  &::-webkit-scrollbar {
-    display: none;
+  // Desktop: el Track scrollea (controlado por el rAF de marquee).
+  @media (pointer: fine) {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar { display: none; }
   }
 
-  // En touch devices (mobile/tablet) usamos scroll-snap nativo + momentum
-  // de iOS. El JS marquee no corre en estos dispositivos, asi que el swipe
-  // del usuario manda. Desktop con mouse mantiene el marquee continuo.
+  // Touch: el Track NO scrollea — el scroll vive en el Viewport padre.
   @media (pointer: coarse) {
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scroll-padding-left: ${({ theme }) => theme.spacing.md};
+    overflow: visible;
   }
 `
 
