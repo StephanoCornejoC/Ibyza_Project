@@ -460,7 +460,10 @@ const ProjectDescription = styled.p`
   max-width: 760px;
 `;
 
-const GallerySection = styled.div``;
+const GallerySection = styled.div`
+  min-width: 0;
+  max-width: 100%;
+`;
 
 const FloorPlanSection = styled.div``;
 
@@ -501,9 +504,12 @@ const MediaSplit = styled.div`
   grid-template-columns: 1fr;
   gap: ${({ theme }) => theme.spacing.xxl};
   align-items: start;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 
   ${({ theme }) => theme.media?.minTablet} {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: ${({ theme }) => theme.spacing.xl};
   }
 `;
