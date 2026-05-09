@@ -254,17 +254,34 @@ class DepartamentoAdmin(ModelAdmin):
 
     @admin.action(description='Regenerar código de acceso')
     def regenerar_codigo_acceso(self, request, queryset):
+        # Pantalla de confirmacion previa: avisa que el comprador anterior
+        # pierde acceso a /avance/<codigo> sin aviso.
+        if 'apply' not in request.POST:
+            from django.template.response import TemplateResponse
+            elegibles = queryset.filter(estado__in=['separado', 'vendido'])
+            return TemplateResponse(
+                request,
+                'admin/projects/confirmar_regenerar_codigo.html',
+                {
+                    'departamentos': elegibles,
+                    'queryset': queryset,
+                    'action': 'regenerar_codigo_acceso',
+                    'opts': self.model._meta,
+                },
+            )
+
+        elegibles = queryset.filter(estado__in=['separado', 'vendido'])
         regenerados = 0
-        for depto in queryset:
+        for depto in elegibles:
             depto.codigo_acceso = None
             depto.save()
             if depto.codigo_acceso:
                 regenerados += 1
-        self.message_user(
-            request,
-            f'Se regeneraron {regenerados} código(s) de acceso. '
-            f'Recordá que solo se generan si el estado es "separado" o "vendido".',
-        )
+        descartados = queryset.count() - elegibles.count()
+        msg = f'Se regeneraron {regenerados} código(s) de acceso.'
+        if descartados:
+            msg += f' ({descartados} ignorado(s) por estar en estado "disponible".)'
+        self.message_user(request, msg)
 
 
 # ─── Avance de obra ─────────────────────────────────────────────────────────

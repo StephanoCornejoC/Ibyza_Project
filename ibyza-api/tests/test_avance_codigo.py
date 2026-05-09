@@ -82,19 +82,19 @@ class CodigoAutogeneracionTest(BaseTestData, TestCase):
             codigos.add(d.codigo_acceso)
         self.assertEqual(len(codigos), 10, 'Los 10 códigos deben ser únicos')
 
-    def test_codigo_persiste_al_volver_a_disponible(self):
-        """Si Diana revierte a disponible, el código existente se mantiene
-        (la activación se controla con codigo_activo)."""
+    def test_codigo_se_limpia_al_volver_a_disponible(self):
+        """SST: si el depto vuelve a disponible, el código del comprador
+        anterior se limpia (revoca acceso) y codigo_activo se resetea."""
         proyecto = self.crear_proyecto()
         nivel = self.crear_nivel(proyecto)
         depto = self.crear_departamento(nivel, estado='vendido')
-        codigo = depto.codigo_acceso
-        self.assertIsNotNone(codigo)
+        self.assertIsNotNone(depto.codigo_acceso)
 
         depto.estado = 'disponible'
         depto.save()
         depto.refresh_from_db()
-        self.assertEqual(depto.codigo_acceso, codigo)
+        self.assertIsNone(depto.codigo_acceso)
+        self.assertTrue(depto.codigo_activo)
 
 
 class AvancePorCodigoEndpointTest(BaseTestData, TestCase):

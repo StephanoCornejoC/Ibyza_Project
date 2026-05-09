@@ -359,3 +359,99 @@ class DepartamentoInlineReadonlyTest(BaseTestData, TestCase):
     def test_modelo_default_es_disponible(self):
         field = Departamento._meta.get_field('estado')
         self.assertEqual(field.default, 'disponible')
+
+
+# ──────────────────────────────────────────────────────────────────────
+# Casuística 5: ciclo de vida del codigo_acceso del comprador
+# ──────────────────────────────────────────────────────────────────────
+
+class CodigoAccesoCicloDeVidaTest(BaseTestData, TestCase):
+    """El codigo_acceso es propiedad del estado del depto (SST):
+       - disponible -> sin codigo
+       - separado/vendido -> codigo autogenerado
+       - vuelve a disponible -> codigo borrado (revoca acceso del comprador anterior)
+    """
+
+    def setUp(self):
+        self.proyecto = self.crear_proyecto()
+        self.nivel = self.crear_nivel(self.proyecto)
+        self.departamento = self.crear_departamento(self.nivel)
+
+    def _crear_separacion(self, **kwargs):
+        from decimal import Decimal
+        defaults = dict(
+            departamento=self.departamento,
+            nombre='Carlos', apellido='Garcia',
+            email='c@t.com', telefono='999111222',
+            dni='12345678', monto=Decimal('1000.00'),
+        )
+        defaults.update(kwargs)
+        return Separacion.objects.create(**defaults)
+
+    def test_disponible_inicial_no_tiene_codigo(self):
+        self.assertIsNone(self.departamento.codigo_acceso)
+
+    def test_codigo_se_genera_al_separar(self):
+        self._crear_separacion(estado='completado', metodo_pago='efectivo')
+        self.departamento.refresh_from_db()
+        self.assertEqual(self.departamento.estado, 'separado')
+        self.assertIsNotNone(self.departamento.codigo_acceso)
+        self.assertTrue(self.departamento.codigo_activo)
+
+    def test_codigo_se_limpia_al_volver_a_disponible(self):
+        sep = self._crear_separacion(estado='completado', metodo_pago='efectivo')
+        self.departamento.refresh_from_db()
+        codigo_original = self.departamento.codigo_acceso
+        self.assertIsNotNone(codigo_original)
+
+        sep.delete()
+        self.departamento.refresh_from_db()
+        self.assertEqual(self.departamento.estado, 'disponible')
+        self.assertIsNone(self.departamento.codigo_acceso)
+        self.assertTrue(self.departamento.codigo_activo)
+
+    def test_codigo_se_regenera_al_volver_a_separar(self):
+        """Comprador A separa -> revoca -> Comprador B separa => codigo distinto."""
+        sep_a = self._crear_separacion(
+            estado='completado', metodo_pago='efectivo', dni='11111111',
+        )
+        self.departamento.refresh_from_db()
+        codigo_a = self.departamento.codigo_acceso
+
+        sep_a.delete()
+        self.departamento.refresh_from_db()
+        self.assertIsNone(self.departamento.codigo_acceso)
+
+        self._crear_separacion(
+            estado='completado', metodo_pago='efectivo', dni='22222222',
+        )
+        self.departamento.refresh_from_db()
+        codigo_b = self.departamento.codigo_acceso
+        self.assertIsNotNone(codigo_b)
+        self.assertNotEqual(codigo_a, codigo_b)
+
+    def test_codigo_se_mantiene_al_pasar_a_vendido(self):
+        """De separado a vendido el codigo NO se regenera (es el mismo comprador)."""
+        self._crear_separacion(estado='completado', metodo_pago='efectivo')
+        self.departamento.refresh_from_db()
+        codigo_separado = self.departamento.codigo_acceso
+
+        self.departamento.estado = 'vendido'
+        self.departamento.save()
+        self.departamento.refresh_from_db()
+        self.assertEqual(self.departamento.codigo_acceso, codigo_separado)
+
+    def test_codigo_activo_se_resetea_al_volver_a_disponible(self):
+        """Si Diana revoco con codigo_activo=False y luego se libera el depto,
+        el flag se resetea para el proximo comprador."""
+        sep = self._crear_separacion(estado='completado', metodo_pago='efectivo')
+        self.departamento.refresh_from_db()
+        self.departamento.codigo_activo = False
+        self.departamento.save()
+        self.departamento.refresh_from_db()
+        self.assertFalse(self.departamento.codigo_activo)
+
+        sep.delete()
+        self.departamento.refresh_from_db()
+        self.assertTrue(self.departamento.codigo_activo)
+        self.assertIsNone(self.departamento.codigo_acceso)

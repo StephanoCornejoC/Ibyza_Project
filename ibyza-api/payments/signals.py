@@ -36,7 +36,10 @@ def _recalcular_estado_departamento(depto):
     nuevo_estado = 'separado' if tiene_aprobada else 'disponible'
     if depto.estado != nuevo_estado:
         depto.estado = nuevo_estado
-        depto.save(update_fields=['estado'])
+        # save() completo: el modelo limpia codigo_acceso al pasar a 'disponible'
+        # y lo autogenera al pasar a 'separado'/'vendido'. Con update_fields=['estado']
+        # esos cambios se perderian.
+        depto.save()
 
 
 @receiver(post_save, sender=Separacion)

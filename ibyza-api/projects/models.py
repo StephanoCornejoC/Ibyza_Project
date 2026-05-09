@@ -214,10 +214,15 @@ class Departamento(models.Model):
         ordering = ['nivel__numero', 'codigo']
 
     def save(self, *args, **kwargs):
-        # Auto-generar código de acceso cuando el depto pasa a separado/vendido
-        # y aún no tiene código. Reintenta hasta 5 veces ante colisiones del
-        # sufijo aleatorio (4 chars alfanuméricos = ~1.7M combinaciones).
-        if (
+        # SST del codigo_acceso:
+        #   estado='disponible' -> sin codigo (revoca acceso del comprador anterior).
+        #   estado='separado'/'vendido' sin codigo -> autogenera SLUG-CODIGO-RAND4.
+        # Reintenta hasta 5 veces ante colisiones del sufijo aleatorio
+        # (4 chars alfanumericos = ~1.7M combinaciones).
+        if self.estado == 'disponible':
+            self.codigo_acceso = None
+            self.codigo_activo = True
+        elif (
             not self.codigo_acceso
             and self.estado in ('separado', 'vendido')
             and self.nivel_id

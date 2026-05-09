@@ -66,13 +66,6 @@ class SolicitudContactoAdmin(ModelAdmin):
         updated = queryset.update(leido=False)
         self.message_user(request, f'{updated} mensaje(s) marcado(s) como NO leido(s).')
 
-    def get_form(self, request, obj=None, **kwargs):
-        # Auto-marcar como leído al abrir el detalle (si no lo estaba)
-        if obj is not None and not obj.leido:
-            obj.leido = True
-            obj.save(update_fields=['leido'])
-        return super().get_form(request, obj, **kwargs)
-
 
 @admin.register(SolicitudCita)
 class SolicitudCitaAdmin(ModelAdmin):
@@ -137,10 +130,22 @@ class SolicitudCitaAdmin(ModelAdmin):
 
     @admin.action(description='Confirmar citas seleccionadas')
     def confirmar_citas(self, request, queryset):
-        updated = queryset.filter(estado='pendiente').update(estado='confirmada')
+        # Iteramos para que dispare post_save (y futuros signals como
+        # envio de email de confirmacion al cliente).
+        elegibles = queryset.filter(estado='pendiente')
+        updated = 0
+        for cita in elegibles:
+            cita.estado = 'confirmada'
+            cita.save(update_fields=['estado'])
+            updated += 1
         self.message_user(request, f'{updated} cita(s) confirmada(s).')
 
     @admin.action(description='Cancelar citas seleccionadas')
     def cancelar_citas(self, request, queryset):
-        updated = queryset.exclude(estado='cancelada').update(estado='cancelada')
+        elegibles = queryset.exclude(estado='cancelada')
+        updated = 0
+        for cita in elegibles:
+            cita.estado = 'cancelada'
+            cita.save(update_fields=['estado'])
+            updated += 1
         self.message_user(request, f'{updated} cita(s) cancelada(s).')
