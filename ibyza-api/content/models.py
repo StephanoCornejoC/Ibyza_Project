@@ -2,16 +2,37 @@ from django.db import models
 
 
 class ContenidoWeb(models.Model):
-    SECCION_CHOICES = [
-        ('hero', 'Inicio — Sección principal (hero)'),
-        ('nosotros', 'Página Nosotros'),
-        ('contacto', 'Página Contacto'),
-        ('footer', 'Pie de página (footer)'),
+    PAGINA_CHOICES = [
+        ('inicio',    'Página Inicio'),
+        ('nosotros',  'Página Nosotros'),
+        ('proyectos', 'Página Proyectos'),
+        ('separar',   'Página Separar'),
+        ('contacto',  'Página Contacto'),
+        ('global',    'Global (footer, modales)'),
     ]
 
+    SECCION_CHOICES = [
+        ('hero',             'Hero principal'),
+        ('quienes_somos',    'Quiénes Somos'),
+        ('mision_vision',    'Misión / Visión / Compromiso'),
+        ('valores',          'Lo que nos define (valores)'),
+        ('cta_final',        'CTA inferior'),
+        ('carrusel',         'Carrusel de proyectos'),
+        ('info_contacto',    'Información de contacto'),
+        ('formulario',       'Formulario'),
+        ('footer',           'Pie de página'),
+        ('modal_bienvenida', 'Modal de bienvenida'),
+    ]
+
+    pagina = models.CharField(
+        'Página de la web', max_length=20, choices=PAGINA_CHOICES,
+        default='inicio',
+        help_text='Página del sitio donde aparece este contenido.',
+        db_index=True,
+    )
     seccion = models.CharField(
-        'Sección de la web', max_length=50, choices=SECCION_CHOICES,
-        help_text='En qué parte del sitio aparece este texto.',
+        'Sección dentro de la página', max_length=50, choices=SECCION_CHOICES,
+        help_text='Bloque dentro de la página (Hero, CTA, Misión, etc.).',
         db_index=True,
     )
     clave = models.CharField(
@@ -26,6 +47,11 @@ class ContenidoWeb(models.Model):
         'Imagen asociada (opcional)', upload_to='contenido/', blank=True, null=True,
         help_text='Solo para textos que también requieren una imagen (ejemplo: hero principal).',
     )
+    orden = models.PositiveIntegerField(
+        'Orden dentro de la sección', default=0,
+        help_text='Menor número aparece primero.',
+        db_index=True,
+    )
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
         help_text='Desmarca para ocultar este contenido sin borrarlo.',
@@ -35,11 +61,11 @@ class ContenidoWeb(models.Model):
     class Meta:
         verbose_name = 'Texto e imagen del sitio'
         verbose_name_plural = 'Textos e imágenes del sitio'
-        ordering = ['seccion', 'clave']
-        unique_together = ['seccion', 'clave']
+        ordering = ['pagina', 'seccion', 'orden', 'clave']
+        unique_together = ['pagina', 'seccion', 'clave']
 
     def __str__(self):
-        return f'{self.get_seccion_display()} → {self.clave}'
+        return f'{self.get_pagina_display()} → {self.get_seccion_display()} → {self.clave}'
 
 
 class ConfiguracionSitio(models.Model):
@@ -179,102 +205,40 @@ class ConfiguracionSitio(models.Model):
         return 'Configuración del sitio'
 
 
-class PreguntaFrecuente(models.Model):
-    """Preguntas frecuentes mostradas en el sitio web."""
-    pregunta = models.CharField('Pregunta', max_length=300)
-    respuesta = models.TextField('Respuesta')
-    orden = models.PositiveIntegerField(
-        'Orden', default=0,
-        help_text='Menor número aparece primero en la sección de FAQ.',
-        db_index=True,
-    )
-    activo = models.BooleanField(
-        'Visible en el sitio', default=True,
-        help_text='Desmarca para ocultar esta pregunta sin borrarla.',
-        db_index=True,
-    )
-
-    class Meta:
-        verbose_name = 'Pregunta frecuente'
-        verbose_name_plural = 'Preguntas frecuentes'
-        ordering = ['orden', 'pregunta']
-
-    def __str__(self):
-        return self.pregunta[:60]
-
-
-class Testimonio(models.Model):
-    """Testimonios de clientes mostrados en el sitio."""
-    nombre = models.CharField('Nombre del cliente', max_length=150)
-    cargo = models.CharField(
-        'Cargo / Ocupación', max_length=200, blank=True,
-        help_text='Ejemplo: "Cliente de Boreal", "Inversionista". Opcional.',
-    )
-    proyecto = models.ForeignKey(
-        'projects.Proyecto', on_delete=models.SET_NULL,
-        related_name='testimonios', verbose_name='Proyecto relacionado (opcional)',
-        blank=True, null=True,
-        help_text='Si el testimonio menciona un proyecto en particular, selecciónalo aquí.',
-    )
-    testimonio = models.TextField(
-        'Texto del testimonio',
-        help_text='Cita textual del cliente.',
-    )
-    foto = models.ImageField(
-        'Foto del cliente (opcional)', upload_to='testimonios/', blank=True, null=True,
-        help_text='Idealmente cuadrada, recomendado 400×400 px.',
-    )
-    calificacion = models.PositiveSmallIntegerField(
-        'Calificación (1 a 5 estrellas)', default=5,
-        help_text='Cantidad de estrellas que se muestran junto al testimonio.',
-    )
-    orden = models.PositiveIntegerField(
-        'Orden', default=0,
-        help_text='Menor número aparece primero.',
-        db_index=True,
-    )
-    activo = models.BooleanField(
-        'Visible en el sitio', default=True,
-        help_text='Desmarca para ocultar este testimonio sin borrarlo.',
-        db_index=True,
-    )
-
-    class Meta:
-        verbose_name = 'Testimonio'
-        verbose_name_plural = 'Testimonios'
-        ordering = ['orden', '-id']
-
-    def __str__(self):
-        return f'{self.nombre} — {self.calificacion}★'
-
-
 class Beneficio(models.Model):
-    """Beneficios/ventajas de comprar con IBYZA (sección home 'Por qué IBYZA')."""
+    """Valores / beneficios de IBYZA. Aparecen en la sección "Lo que nos define"
+    de la página Nosotros (carrusel con auto-play). Editables 100% desde admin:
+    título, descripción, imagen de fondo y icono."""
+
     titulo = models.CharField(
-        'Título del beneficio', max_length=150,
-        help_text='Frase corta. Ejemplo: "Ubicación estratégica", "Acabados premium".',
+        'Título del valor', max_length=150,
+        help_text='Nombre corto. Ejemplo: "Compromiso", "Calidad", "Innovación".',
     )
     descripcion = models.TextField(
-        'Descripción', help_text='Explicación del beneficio (1-2 oraciones).',
+        'Descripción', help_text='Frase explicativa (1-2 oraciones).',
+    )
+    imagen = models.ImageField(
+        'Imagen de fondo', upload_to='valores/', blank=True, null=True,
+        help_text='Imagen que aparece de fondo en la card del valor. Recomendado: 800×600 px, máximo 400 KB. Si no subís imagen, la card queda con fondo oscuro plano.',
     )
     icono = models.CharField(
         'Icono', max_length=50, default='ShieldCheck',
-        help_text='Nombre exacto de un icono de Lucide. Lista: https://lucide.dev/icons. Ejemplos: Home, Key, Award, ShieldCheck.',
+        help_text='Nombre exacto de un icono de Lucide (https://lucide.dev/icons). Ejemplos: Shield, Star, Zap, Heart, Users, Award.',
     )
     orden = models.PositiveIntegerField(
         'Orden', default=0,
-        help_text='Menor número aparece primero.',
+        help_text='Menor número aparece primero en el carrusel.',
         db_index=True,
     )
     activo = models.BooleanField(
         'Visible en el sitio', default=True,
-        help_text='Desmarca para ocultar este beneficio sin borrarlo.',
+        help_text='Desmarca para ocultar este valor sin borrarlo.',
         db_index=True,
     )
 
     class Meta:
-        verbose_name = 'Beneficio / Valor'
-        verbose_name_plural = 'Beneficios / Valores'
+        verbose_name = 'Valor / Beneficio'
+        verbose_name_plural = 'Valores / Beneficios'
         ordering = ['orden']
 
     def __str__(self):

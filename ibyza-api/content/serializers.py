@@ -1,11 +1,11 @@
 from rest_framework import serializers
-from .models import ContenidoWeb, ConfiguracionSitio, PreguntaFrecuente, Testimonio, Beneficio
+from .models import ContenidoWeb, ConfiguracionSitio, Beneficio
 
 
 class ContenidoWebSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContenidoWeb
-        fields = ['seccion', 'clave', 'valor', 'imagen']
+        fields = ['pagina', 'seccion', 'clave', 'valor', 'imagen', 'orden']
 
 
 class ConfiguracionSitioSerializer(serializers.ModelSerializer):
@@ -14,21 +14,7 @@ class ConfiguracionSitioSerializer(serializers.ModelSerializer):
         exclude = ['id']
 
 
-class PreguntaFrecuenteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PreguntaFrecuente
-        fields = ['id', 'pregunta', 'respuesta', 'orden']
-
-
-class TestimonioSerializer(serializers.ModelSerializer):
-    proyecto_nombre = serializers.CharField(source='proyecto.nombre', read_only=True, default='')
-
-    class Meta:
-        model = Testimonio
-        fields = ['id', 'nombre', 'cargo', 'proyecto_nombre', 'testimonio', 'foto', 'calificacion', 'orden']
-
-
 class BeneficioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Beneficio
-        fields = ['id', 'titulo', 'descripcion', 'icono', 'orden']
+        fields = ['id', 'titulo', 'descripcion', 'imagen', 'icono', 'orden']

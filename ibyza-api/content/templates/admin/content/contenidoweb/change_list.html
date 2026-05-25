@@ -1,0 +1,105 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls static %}
+
+{# Vista en arbol agrupada por Pagina > Seccion. Solo se renderiza cuando
+   no hay filtros/busqueda activos (show_tree=True). Si Diana filtra o
+   busca, cae al listado plano original heredado de admin/change_list.html.
+
+   Cada `item` del tree es un dict con:
+     pk, clave, valor, imagen_url, activo, kind (contenidoweb|beneficio), edit_url
+#}
+
+{% block content %}
+  {% if show_tree and contenido_tree %}
+    <div id="content-main" class="cms-tree-wrapper">
+
+      <div class="cms-tree-toolbar" style="display:flex;justify-content:space-between;align-items:center;margin:0 0 1.25rem;gap:1rem;flex-wrap:wrap;">
+        <div style="font-size:.85rem;color:#6b7280;line-height:1.6;">
+          Los contenidos están organizados por <strong>página</strong> y luego por <strong>sección</strong>.
+          Para editar uno, hacé clic en su nombre. Para agregar, usá el botón de la derecha.
+        </div>
+        {% if has_add_permission %}
+          <a href="{% url cl.opts|admin_urlname:'add' %}{% if is_popup %}?_popup=1{% endif %}"
+             class="addlink"
+             style="background:#0ea5e9;color:#fff;padding:.5rem 1rem;border-radius:8px;text-decoration:none;font-weight:600;font-size:.85rem;white-space:nowrap;">
+            + Agregar contenido
+          </a>
+        {% endif %}
+      </div>
+
+      {% for pagina in contenido_tree %}
+        <section class="cms-pagina" style="margin-bottom:2rem;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;">
+          <header style="background:linear-gradient(90deg,#0f172a,#1e293b);color:#fff;padding:.85rem 1.25rem;display:flex;align-items:center;gap:.75rem;">
+            <span style="font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;opacity:.65;font-weight:700;">Página</span>
+            <strong style="font-size:1.05rem;letter-spacing:-.01em;">{{ pagina.label }}</strong>
+            <span style="margin-left:auto;font-size:.75rem;opacity:.55;">
+              {{ pagina.secciones|length }} sección{{ pagina.secciones|length|pluralize:"es" }}
+            </span>
+          </header>
+
+          {% for seccion in pagina.secciones %}
+            <div class="cms-seccion" style="border-top:1px solid #f1f5f9;">
+              <div style="padding:.65rem 1.25rem;background:#f8fafc;display:flex;align-items:center;gap:.75rem;">
+                <span style="width:6px;height:6px;border-radius:50%;background:#d6b370;display:inline-block;"></span>
+                <strong style="font-size:.9rem;color:#0f172a;">{{ seccion.label }}</strong>
+                <span style="margin-left:auto;font-size:.7rem;color:#94a3b8;">
+                  {{ seccion.items|length }} campo{{ seccion.items|length|pluralize }}
+                </span>
+              </div>
+
+              <table style="width:100%;border-collapse:collapse;">
+                <tbody>
+                  {% for item in seccion.items %}
+                    <tr style="border-top:1px solid #f1f5f9;">
+                      <td style="width:80px;padding:.55rem 1.25rem;">
+                        {% if item.imagen_url %}
+                          <img src="{{ item.imagen_url }}" style="width:46px;height:34px;object-fit:cover;border-radius:6px;" />
+                        {% else %}
+                          <div style="width:46px;height:34px;background:#f3f4f6;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:10px;">
+                            {% if item.clave|slice:":7" == "imagen_" %}Imagen{% else %}Texto{% endif %}
+                          </div>
+                        {% endif %}
+                      </td>
+                      <td style="padding:.55rem .5rem;width:30%;">
+                        <a href="{{ item.edit_url }}"
+                           style="font-weight:600;color:#0f172a;text-decoration:none;font-family:ui-monospace,Menlo,monospace;font-size:.85rem;">
+                          {{ item.clave }}
+                        </a>
+                        {% if item.kind == "beneficio" %}
+                          <span style="display:inline-block;margin-left:.5rem;background:#fef3c7;color:#92400e;font-size:.65rem;padding:.05rem .4rem;border-radius:4px;font-family:system-ui,sans-serif;letter-spacing:.05em;">VALOR</span>
+                        {% endif %}
+                      </td>
+                      <td style="padding:.55rem .5rem;color:#475569;font-size:.85rem;">
+                        {% if item.valor %}
+                          {{ item.valor|truncatechars:90 }}
+                        {% elif item.imagen_url %}
+                          <span style="color:#64748b;font-style:italic;">imagen subida</span>
+                        {% else %}
+                          <span style="color:#cbd5e1;font-style:italic;">— sin contenido —</span>
+                        {% endif %}
+                      </td>
+                      <td style="padding:.55rem 1.25rem;text-align:right;font-size:.8rem;">
+                        {% if item.activo %}
+                          <span style="background:#dcfce7;color:#15803d;padding:.15rem .55rem;border-radius:999px;font-weight:600;">Visible</span>
+                        {% else %}
+                          <span style="background:#fee2e2;color:#b91c1c;padding:.15rem .55rem;border-radius:999px;font-weight:600;">Oculto</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endfor %}
+        </section>
+      {% endfor %}
+
+      <div style="margin-top:1.5rem;padding:.75rem 1rem;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:.8rem;color:#78350f;">
+        💡 Si necesitás <strong>buscar</strong>, <strong>filtrar</strong> o usar acciones masivas, escribí algo en el buscador o aplicá un filtro arriba — ahí aparece el listado tradicional editable.
+      </div>
+    </div>
+
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}

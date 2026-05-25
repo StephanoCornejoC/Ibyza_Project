@@ -3,26 +3,31 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from .models import ContenidoWeb, ConfiguracionSitio, PreguntaFrecuente, Testimonio, Beneficio
+from .models import ContenidoWeb, ConfiguracionSitio, Beneficio
 from .serializers import (
     ContenidoWebSerializer,
     ConfiguracionSitioSerializer,
-    PreguntaFrecuenteSerializer,
-    TestimonioSerializer,
     BeneficioSerializer,
 )
 
 
 class ContenidoWebView(generics.ListAPIView):
-    """GET /api/contenido/?seccion=hero"""
+    """GET /api/contenido/?pagina=inicio&seccion=hero
+
+    Ambos query params son opcionales y se combinan con AND.
+    Si no se manda nada, devuelve todos los entries activos.
+    """
     serializer_class = ContenidoWebSerializer
 
     def get_queryset(self):
         qs = ContenidoWeb.objects.filter(activo=True)
+        pagina = self.request.query_params.get('pagina')
         seccion = self.request.query_params.get('seccion')
+        if pagina:
+            qs = qs.filter(pagina=pagina)
         if seccion:
             qs = qs.filter(seccion=seccion)
-        return qs
+        return qs.order_by('pagina', 'seccion', 'orden', 'clave')
 
 
 @method_decorator(cache_page(30), name='dispatch')
@@ -32,22 +37,6 @@ class ConfiguracionSitioView(APIView):
         config = ConfiguracionSitio.get_solo()
         serializer = ConfiguracionSitioSerializer(config)
         return Response(serializer.data)
-
-
-@method_decorator(cache_page(30), name='dispatch')
-class PreguntasFrecuentesView(generics.ListAPIView):
-    """GET /api/faq/ — Lista de preguntas frecuentes publicadas."""
-    serializer_class = PreguntaFrecuenteSerializer
-    queryset = PreguntaFrecuente.objects.filter(activo=True)
-    pagination_class = None
-
-
-@method_decorator(cache_page(30), name='dispatch')
-class TestimoniosView(generics.ListAPIView):
-    """GET /api/testimonios/ — Lista de testimonios publicados."""
-    serializer_class = TestimonioSerializer
-    queryset = Testimonio.objects.filter(activo=True).select_related('proyecto')
-    pagination_class = None
 
 
 @method_decorator(cache_page(30), name='dispatch')
