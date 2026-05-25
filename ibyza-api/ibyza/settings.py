@@ -267,10 +267,25 @@ UNFOLD = {
     "SITE_URL": "/",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": False,
+    # Logo del header del admin (mismo logo IBYZA del hero del sitio).
+    "SITE_ICON": {
+        "light": lambda request: "/static/content/favicon-64.png",
+        "dark":  lambda request: "/static/content/favicon-64.png",
+    },
+    # Favicons del tab del browser para el admin.
+    "SITE_FAVICONS": [
+        {
+            "rel": "icon",
+            "sizes": "64x64",
+            "type": "image/png",
+            "href": lambda request: "/static/content/favicon-64.png",
+        },
+    ],
     # Persiste el scroll del sidebar entre navegaciones (sino al abrir
     # cualquier modulo el sidebar vuelve arriba y se pierde el hilo).
+    # El archivo vive en `content/static/content/admin_sidebar_scroll.js`.
     "SCRIPTS": [
-        lambda request: "/static/admin/js/sidebar-scroll-memory.js",
+        lambda request: "/static/content/admin_sidebar_scroll.js",
     ],
     # Colores de marca IBYZA (azul #0F233B)
     "COLORS": {
@@ -288,7 +303,11 @@ UNFOLD = {
             "950": "9   24  39",
         },
     },
-    # Menu lateral organizado por frecuencia de uso (lo mas usado primero)
+    # Menu lateral organizado por frecuencia de uso (lo mas usado primero).
+    # Cada item soporta `permission` callable que filtra por request.user.
+    # El grupo "Usuarios y accesos" se esconde entero para non-superusers
+    # gracias al monkey-patch de UnfoldAdminSite.get_sidebar_list en
+    # `content.admin` (filtra grupos sin items visibles).
     "SIDEBAR": {
         "show_search": True,
         "show_all_applications": False,
@@ -311,81 +330,36 @@ UNFOLD = {
                 ],
             },
             {
+                # Niveles, Galeria y Videos NO aparecen como links aqui:
+                # son editables 100% inline desde la pagina del Proyecto.
+                # Quedan accesibles por URL directa si Diana algun dia necesita
+                # la vista plana (raro), pero fuera del sidebar para reducir
+                # ruido y guiar el workflow contextual.
                 "title": "Proyectos inmobiliarios",
                 "separator": True,
                 "items": [
-                    {
-                        "title": "Proyectos",
-                        "icon": "apartment",
-                        "link": reverse_lazy("admin:projects_proyecto_changelist"),
-                    },
-                    {
-                        "title": "Avances de obra",
-                        "icon": "construction",
-                        "link": reverse_lazy("admin:projects_avancedeobra_changelist"),
-                    },
-                    {
-                        "title": "Galería de fotos",
-                        "icon": "photo_library",
-                        "link": reverse_lazy("admin:projects_imagengaleria_changelist"),
-                    },
-                    {
-                        "title": "Videos",
-                        "icon": "play_circle",
-                        "link": reverse_lazy("admin:projects_videoproyecto_changelist"),
-                    },
-                    {
-                        "title": "Pisos / Niveles",
-                        "icon": "stacks",
-                        "link": reverse_lazy("admin:projects_nivel_changelist"),
-                    },
-                    {
-                        "title": "Departamentos",
-                        "icon": "door_open",
-                        "link": reverse_lazy("admin:projects_departamento_changelist"),
-                    },
+                    {"title": "Proyectos",        "icon": "apartment",     "link": reverse_lazy("admin:projects_proyecto_changelist")},
+                    {"title": "Departamentos",    "icon": "door_open",     "link": reverse_lazy("admin:projects_departamento_changelist")},
+                    {"title": "Avances de obra",  "icon": "construction",  "link": reverse_lazy("admin:projects_avancedeobra_changelist")},
                 ],
             },
             {
+                # Nota: el modelo `Beneficio` (Valores) NO aparece como link
+                # separado aqui — esta embebido en el changelist de
+                # "Textos e imagenes" bajo Pagina Nosotros > Lo que nos define.
+                # Esto da una vista CMS unificada para Diana en un solo lugar.
                 "title": "Contenido del sitio",
                 "separator": True,
                 "items": [
-                    {
-                        "title": "Configuracion general",
-                        "icon": "settings",
-                        "link": reverse_lazy("admin:content_configuracionsitio_changelist"),
-                    },
-                    {
-                        "title": "Textos e imagenes",
-                        "icon": "edit_note",
-                        "link": reverse_lazy("admin:content_contenidoweb_changelist"),
-                    },
-                    {
-                        "title": "Testimonios",
-                        "icon": "format_quote",
-                        "link": reverse_lazy("admin:content_testimonio_changelist"),
-                    },
-                    {
-                        "title": "Preguntas frecuentes",
-                        "icon": "help",
-                        "link": reverse_lazy("admin:content_preguntafrecuente_changelist"),
-                    },
-                    {
-                        "title": "Beneficios / Valores",
-                        "icon": "star",
-                        "link": reverse_lazy("admin:content_beneficio_changelist"),
-                    },
+                    {"title": "Configuracion general", "icon": "settings",  "link": reverse_lazy("admin:content_configuracionsitio_changelist")},
+                    {"title": "Textos e imagenes",     "icon": "edit_note", "link": reverse_lazy("admin:content_contenidoweb_changelist")},
                 ],
             },
             {
                 "title": "Pagos / Separaciones",
                 "separator": True,
                 "items": [
-                    {
-                        "title": "Separaciones recibidas",
-                        "icon": "payments",
-                        "link": reverse_lazy("admin:payments_separacion_changelist"),
-                    },
+                    {"title": "Separaciones recibidas", "icon": "payments", "link": reverse_lazy("admin:payments_separacion_changelist")},
                 ],
             },
             {
@@ -396,11 +370,13 @@ UNFOLD = {
                         "title": "Usuarios del panel",
                         "icon": "person",
                         "link": reverse_lazy("admin:auth_user_changelist"),
+                        "permission": lambda request: bool(request.user and request.user.is_superuser),
                     },
                     {
                         "title": "Grupos de permisos",
                         "icon": "group",
                         "link": reverse_lazy("admin:auth_group_changelist"),
+                        "permission": lambda request: bool(request.user and request.user.is_superuser),
                     },
                 ],
             },
@@ -417,6 +393,19 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# ─── CSRF Trusted Origins ────────────────────────────────────────────────────
+# Django 4+ requiere lista explicita de origins con esquema para validar CSRF
+# en POST al admin desde HTTPS. Sin esto, Diana no puede loguearse al admin
+# en Railway (CSRF token rechazado).
+#
+# Setear como env var en Railway:
+#   CSRF_TRUSTED_ORIGINS=https://ibyza-api.up.railway.app,https://api.ibyzacorp.com
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
 
 # ─── Logging ─────────────────────────────────────────────────────────────────
 LOGGING = {
