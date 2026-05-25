@@ -1,15 +1,17 @@
-"""Crea (o actualiza) el usuario `diana` y el grupo `Administracion IBYZA`
-con permisos limitados sobre los modelos de negocio. NO superuser — Diana
-no puede crear/borrar usuarios ni cambiar permisos.
+"""Crea (o actualiza) el usuario operativo del admin (Diana) y el grupo
+`Administracion IBYZA` con permisos limitados sobre los modelos de negocio.
+NO superuser — el usuario no puede crear/borrar usuarios ni cambiar permisos.
 
 Idempotente: corre cuantas veces quieras, no duplica nada. Si el usuario
 ya existe, mantiene su password actual (no la reescribe). Si es la primera
-vez, usa la password pasada por argumento o `IbyzaDiana2026!` por defecto.
+vez y no se provee password (ni por arg ni por env var DIANA_PASSWORD), se
+genera una random con `secrets.token_urlsafe(16)` y se muestra en stdout.
 
 Uso:
-    python manage.py setup_diana
-    python manage.py setup_diana --password 'NuevaPass123!'
-    python manage.py setup_diana --reset-password   # fuerza reset al default
+    python manage.py setup_diana                            # genera password random
+    python manage.py setup_diana --password 'NuevaPass!'    # password explicita
+    DIANA_PASSWORD=xxx python manage.py setup_diana         # via env var
+    python manage.py setup_diana --reset-password           # fuerza reset con random
 
 El grupo `Administracion IBYZA` recibe permisos add/change/view/delete sobre:
     - projects.*          (Proyecto, Departamento, Nivel, AvanceObra, ImagenProyecto, etc.)
@@ -24,6 +26,7 @@ Explicitamente NO recibe permisos sobre:
     - contenttypes.*      (ContentType)
 """
 import os
+import secrets
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
@@ -31,29 +34,40 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
 
 
-# Apps de negocio que Diana puede gestionar.
+# Apps de negocio que el usuario operativo puede gestionar.
 APPS_PERMITIDAS = ['projects', 'payments', 'contact', 'content']
 
-DEFAULT_DIANA_PASSWORD = 'IbyzaDiana2026!'
-DEFAULT_DIANA_EMAIL = 'diana@ibyza.com'
+DEFAULT_USERNAME = 'admin.ibyzacorp'
+DEFAULT_EMAIL = 'admin@ibyzacorp.com'
 DEFAULT_GROUP_NAME = 'Administracion IBYZA'
 
 
+def _generate_password(length: int = 16) -> str:
+    """Genera una password aleatoria URL-safe (cripto-fuerte)."""
+    return secrets.token_urlsafe(length)
+
+
 class Command(BaseCommand):
-    help = 'Crea/actualiza el usuario diana y su grupo de permisos.'
+    help = 'Crea/actualiza el usuario operativo del admin y su grupo de permisos.'
 
     def add_arguments(self, parser):
         parser.add_argument('--password', type=str, default=None,
-                            help='Password inicial si el usuario no existe.')
+                            help='Password inicial. Si se omite, se genera una random.')
         parser.add_argument('--reset-password', action='store_true',
-                            help='Forzar reset del password (incluso si el usuario ya existe).')
-        parser.add_argument('--email', type=str, default=DEFAULT_DIANA_EMAIL)
-        parser.add_argument('--username', type=str, default='diana')
+                            help='Forzar reset del password con uno random.')
+        parser.add_argument('--email', type=str, default=DEFAULT_EMAIL)
+        parser.add_argument('--username', type=str, default=DEFAULT_USERNAME)
 
     def handle(self, *args, **options):
         username = options['username']
         email = options['email']
-        password = options['password'] or os.environ.get('DIANA_PASSWORD') or DEFAULT_DIANA_PASSWORD
+        # Prioridad: --password explicito > DIANA_PASSWORD env var > random generada.
+        # Eliminado el default hardcoded (era leak de GitHub Secret Scanning).
+        password = (
+            options['password']
+            or os.environ.get('DIANA_PASSWORD')
+            or _generate_password()
+        )
         force_reset = options['reset_password']
 
         # ─── 1. Crear/actualizar grupo con permisos ───────────────────────────
