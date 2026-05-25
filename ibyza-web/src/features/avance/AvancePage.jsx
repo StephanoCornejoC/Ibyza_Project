@@ -17,7 +17,6 @@ import {
   AlertCircle,
 } from 'lucide-react'
 
-import { SectionTitle } from '@/shared/components/ui/SectionTitle'
 import { Spinner } from '@/shared/components/ui/Spinner'
 import { EmptyState } from '@/shared/components/ui/EmptyState'
 import { ROUTES, buildAvanceRoute, buildProjectDetailRoute } from '@/shared/constants/routes'
@@ -92,19 +91,7 @@ const SearchView = ({ errorFromQuery }) => {
   }, [errorFromQuery])
 
   return (
-    <>
-      <Hero $half>
-        <HeroOverlay />
-        <HeroContent>
-          <SectionTitle
-            eyebrow="Avance de obra"
-            title="Avance de tu departamento"
-            subtitle="Ingresá el código que recibiste al separar tu unidad para ver el progreso de la obra."
-            light
-          />
-        </HeroContent>
-      </Hero>
-
+    <CenteredPage>
       <ContentWrapper>
         <SearchCard
           as={motion.div}
@@ -116,9 +103,9 @@ const SearchView = ({ errorFromQuery }) => {
             <SearchIconCircle>
               <KeyRound size={26} />
             </SearchIconCircle>
-            <SearchTitle>Ingresá tu código</SearchTitle>
+            <SearchTitle>Avance de tu departamento</SearchTitle>
             <SearchHelp>
-              Lo encontrás en el correo de confirmación de tu separación.
+              Ingresá el código que recibiste al separar tu unidad para ver el progreso de la obra.
             </SearchHelp>
           </SearchHeader>
 
@@ -163,7 +150,7 @@ const SearchView = ({ errorFromQuery }) => {
           </SearchFooter>
         </SearchCard>
       </ContentWrapper>
-    </>
+    </CenteredPage>
   )
 }
 
@@ -172,20 +159,14 @@ const SearchView = ({ errorFromQuery }) => {
 // ============================================================================
 
 const LoadingView = () => (
-  <>
-    <Hero $half>
-      <HeroOverlay />
-      <HeroContent>
-        <SectionTitle eyebrow="Avance de obra" title="Cargando..." light />
-      </HeroContent>
-    </Hero>
+  <CenteredPage>
     <ContentWrapper>
       <CenteredColumn>
         <Spinner size="lg" />
         <LoadingText>Cargando avance de tu departamento...</LoadingText>
       </CenteredColumn>
     </ContentWrapper>
-  </>
+  </CenteredPage>
 )
 
 // ============================================================================
@@ -216,14 +197,7 @@ const ErrorView = ({ errorCode }) => {
   }, [errorCode])
 
   return (
-    <>
-      <Hero $half>
-        <HeroOverlay />
-        <HeroContent>
-          <SectionTitle eyebrow="Avance de obra" title="Sin resultados" light />
-        </HeroContent>
-      </Hero>
-
+    <CenteredPage>
       <ContentWrapper>
         <ErrorCard
           as={motion.div}
@@ -244,7 +218,7 @@ const ErrorView = ({ errorCode }) => {
           </ErrorActions>
         </ErrorCard>
       </ContentWrapper>
-    </>
+    </CenteredPage>
   )
 }
 
@@ -429,52 +403,31 @@ const formatFecha = (fecha) => {
 // Styled components
 // ============================================================================
 
-// --- Hero genérico (search, loading, error) ---
+// --- Layout sin hero: pagina centrada con la card como protagonista ---
 
-const Hero = styled.section`
-  position: relative;
-  height: ${({ $half }) => ($half ? '50vh' : '100vh')};
-  min-height: ${({ $half }) => ($half ? '380px' : '600px')};
+const CenteredPage = styled.section`
+  min-height: 100vh;
   background-color: ${({ theme }) => theme.colors.deepBg};
-  background-image: url(${heroBg});
-  background-size: cover;
-  background-position: center;
+  background-image:
+    radial-gradient(ellipse at 30% 30%, rgba(214,179,112,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 70%, rgba(214,179,112,0.05) 0%, transparent 55%),
+    linear-gradient(180deg, ${({ theme }) => theme.colors.deepBg} 0%, ${({ theme }) => theme.colors.primary} 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: ${({ theme }) => `${theme.spacing.section} ${theme.spacing.lg}`};
-  padding-top: calc(80px + ${({ theme }) => theme.spacing.xl});
-  overflow: hidden;
+  /* Compensa la altura del navbar fijo para que la card quede centrada visualmente */
+  padding-top: 80px;
+  padding-bottom: ${({ theme }) => theme.spacing.xxxl};
 
   ${({ theme }) => theme.media.tablet} {
-    padding: ${({ theme }) => `${theme.spacing.xxxl} ${theme.spacing.md}`};
-    padding-top: calc(70px + ${({ theme }) => theme.spacing.lg});
-    min-height: 320px;
+    padding-top: 70px;
   }
 
   ${({ theme }) => theme.media.mobile} {
-    padding-top: calc(64px + ${({ theme }) => theme.spacing.md});
-    min-height: 280px;
+    padding-top: 64px;
+    align-items: flex-start;
+    padding-bottom: ${({ theme }) => theme.spacing.xxl};
   }
-`
-
-const HeroOverlay = styled.div`
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(135deg, rgba(15,35,59,0.86) 0%, rgba(15,35,59,0.74) 100%),
-    radial-gradient(ellipse at 30% 30%, rgba(214,179,112,0.10) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 70%, rgba(214,179,112,0.06) 0%, transparent 60%);
-  pointer-events: none;
-`
-
-const HeroContent = styled.div`
-  position: relative;
-  z-index: 1;
-  max-width: ${({ theme }) => theme.container.maxWidth};
-  width: 100%;
-  margin: 0 auto;
-  text-align: center;
 `
 
 const ContentWrapper = styled.div`

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
-import { MapPin, Calendar, Building2, Download, Play, ArrowLeft } from 'lucide-react';
+import { MapPin, Calendar, Building2, Download, Play, ArrowLeft, ArrowRight, KeyRound } from 'lucide-react';
 import { ROUTES } from '@/shared/constants/routes';
 import useProjectDetail from './hooks/useProjectDetail';
 import { ProjectGallery } from './components/ProjectGallery';
@@ -288,6 +288,23 @@ const ProjectDetailPage = () => {
             <ProgressUpdates advances={advances} />
           </ProgressSection>
         )}
+
+        {/* CTA: acceso al avance personalizado para compradores con codigo */}
+        <AvanceCTASection>
+          <AvanceCTAIcon>
+            <KeyRound size={26} />
+          </AvanceCTAIcon>
+          <AvanceCTAText>
+            <AvanceCTATitle>¿Ya separaste tu departamento?</AvanceCTATitle>
+            <AvanceCTASubtitle>
+              Ingresá el código que recibiste al separar para ver el avance personalizado de tu unidad.
+            </AvanceCTASubtitle>
+          </AvanceCTAText>
+          <AvanceCTAButton as={Link} to={ROUTES.AVANCE}>
+            Ver mi avance
+            <ArrowRight size={16} />
+          </AvanceCTAButton>
+        </AvanceCTASection>
       </PageContent>
 
       <DepartmentModal
@@ -637,6 +654,100 @@ const BackLink = styled(Link)`
     margin: ${({ theme }) => `calc(64px + ${theme.spacing.md}) ${theme.spacing.md} 0`};
     letter-spacing: 1.5px;
     padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  }
+`;
+
+const AvanceCTASection = styled.section`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.xl};
+  background: ${({ theme }) => theme.glass.card};
+  border: 1px solid ${({ theme }) => theme.glass.border};
+  border-radius: 18px;
+  padding: ${({ theme }) => theme.spacing.xl};
+  margin: ${({ theme }) => theme.spacing.xxl} 0 0;
+  backdrop-filter: ${({ theme }) => theme.glass.blur};
+  box-shadow: ${({ theme }) => theme.glass.shadow};
+
+  ${({ theme }) => theme.media.tablet} {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: ${({ theme }) => theme.spacing.lg};
+  }
+
+  ${({ theme }) => theme.media.mobile} {
+    padding: ${({ theme }) => theme.spacing.lg};
+    border-radius: 14px;
+  }
+`;
+
+const AvanceCTAIcon = styled.div`
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgba(214,179,112,0.12);
+  border: 1px solid rgba(214,179,112,0.3);
+  color: ${({ theme }) => theme.colors.gold};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const AvanceCTAText = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
+const AvanceCTATitle = styled.h3`
+  font-family: ${({ theme }) => theme.fonts.heading};
+  font-size: ${({ theme }) => theme.fontSizes.xl};
+  font-weight: 900;
+  color: ${({ theme }) => theme.colors.white};
+  margin: 0 0 ${({ theme }) => theme.spacing.xs};
+  letter-spacing: -0.3px;
+
+  ${({ theme }) => theme.media.mobile} {
+    font-size: ${({ theme }) => theme.fontSizes.lg};
+  }
+`;
+
+const AvanceCTASubtitle = styled.p`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: 300;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  line-height: 1.6;
+  margin: 0;
+`;
+
+const AvanceCTAButton = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  background: ${({ theme }) => theme.gradients.gold};
+  color: ${({ theme }) => theme.colors.deepBg};
+  font-family: ${({ theme }) => theme.fonts.body};
+  font-weight: 700;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.xl}`};
+  border-radius: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 16px rgba(214,179,112,0.28);
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(214,179,112,0.45);
+    transform: translateY(-2px);
+  }
+
+  svg { transition: transform 0.15s ease; }
+  &:hover svg { transform: translateX(3px); }
+
+  ${({ theme }) => theme.media.mobile} {
+    width: 100%;
+    justify-content: center;
   }
 `;
 

@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import styled from 'styled-components'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Shield, Star, Users, Zap, Heart, Award, ChevronLeft, ChevronRight } from 'lucide-react'
+import * as LucideIcons from 'lucide-react'
+import { Shield, ChevronLeft, ChevronRight } from 'lucide-react'
+import api from '@/shared/services/api'
 
 import valCompromiso from '@/assets/images/values-compromiso.webp'
 import valIntegridad from '@/assets/images/values-integridad.webp'
@@ -11,60 +13,59 @@ import valProfesionalismo from '@/assets/images/values-profesionalismo.webp'
 import valCalidad from '@/assets/images/values-calidad.webp'
 
 /**
- * ValuesCarousel — Carrusel de 6 valores con auto-play cada 4s.
- * Cards anchas con imagen de fondo opacada. Pausa SOLO al hover en la card.
+ * ValuesCarousel — Carrusel de valores con auto-play cada 4s.
+ * Los valores vienen del CMS (modelo Beneficio, endpoint GET /api/beneficios/).
+ * Si el fetch falla o tarda, usa los 6 valores fallback hardcoded para no
+ * dejar la pagina vacia.
+ *
+ * El icono se mapea por nombre desde lucide-react. Si Diana pone un nombre
+ * que no existe, cae al icono `Shield` por defecto.
  */
-const VALUES = [
-  {
-    icon: Shield,
-    title: 'Compromiso',
-    description: 'Nos comprometemos con la satisfacción total de nuestros clientes y el desarrollo de la comunidad.',
-    image: valCompromiso,
-  },
-  {
-    icon: Star,
-    title: 'Integridad',
-    description: 'Construimos relaciones duraderas basadas en la transparencia y la honestidad en cada decisión.',
-    image: valIntegridad,
-  },
-  {
-    icon: Zap,
-    title: 'Innovación',
-    description: 'Incorporamos las últimas tendencias en diseño arquitectónico y tecnologías constructivas.',
-    image: valInnovacion,
-  },
-  {
-    icon: Heart,
-    title: 'Sostenibilidad',
-    description: 'Desarrollamos proyectos responsables con el medio ambiente y el entorno urbano.',
-    image: valSostenibilidad,
-  },
-  {
-    icon: Users,
-    title: 'Profesionalismo',
-    description: 'Un equipo altamente calificado que acompaña cada etapa del proceso de inversión.',
-    image: valProfesionalismo,
-  },
-  {
-    icon: Award,
-    title: 'Calidad',
-    description: 'Cada proyecto es ejecutado con los más altos estándares de construcción y acabados premium.',
-    image: valCalidad,
-  },
+const FALLBACK_VALUES = [
+  { id: 'f-1', title: 'Compromiso',     description: 'Nos comprometemos con la satisfacción total de nuestros clientes y el desarrollo de la comunidad.',  image: valCompromiso,     icon: 'Shield' },
+  { id: 'f-2', title: 'Integridad',     description: 'Construimos relaciones duraderas basadas en la transparencia y la honestidad en cada decisión.',     image: valIntegridad,     icon: 'Star' },
+  { id: 'f-3', title: 'Innovación',     description: 'Incorporamos las últimas tendencias en diseño arquitectónico y tecnologías constructivas.',           image: valInnovacion,     icon: 'Zap' },
+  { id: 'f-4', title: 'Sostenibilidad', description: 'Desarrollamos proyectos responsables con el medio ambiente y el entorno urbano.',                     image: valSostenibilidad, icon: 'Heart' },
+  { id: 'f-5', title: 'Profesionalismo',description: 'Un equipo altamente calificado que acompaña cada etapa del proceso de inversión.',                    image: valProfesionalismo,icon: 'Users' },
+  { id: 'f-6', title: 'Calidad',        description: 'Cada proyecto es ejecutado con los más altos estándares de construcción y acabados premium.',         image: valCalidad,        icon: 'Award' },
 ]
 
 const ValuesCarousel = () => {
+  const [values, setValues] = useState(FALLBACK_VALUES)
   const [current, setCurrent] = useState(0)
   const [direction, setDirection] = useState(1)
   const [paused, setPaused] = useState(false)
   const intervalRef = useRef(null)
+
+  // Fetch del CMS — si falla, los fallback ya estan cargados.
+  useEffect(() => {
+    let mounted = true
+    api.get('/api/beneficios/')
+      .then((res) => {
+        if (!mounted) return
+        const items = res.data?.results || res.data || []
+        if (Array.isArray(items) && items.length > 0) {
+          setValues(items.map((b) => ({
+            id: b.id,
+            title: b.titulo,
+            description: b.descripcion,
+            image: b.imagen || null,
+            icon: b.icono || 'Shield',
+          })))
+        }
+      })
+      .catch(() => {
+        // Mantener fallback silenciosamente.
+      })
+    return () => { mounted = false }
+  }, [])
 
   const startTimer = useCallback(() => {
     clearInterval(intervalRef.current)
     intervalRef.current = setInterval(() => {
       if (!paused) {
         setDirection(1)
-        setCurrent((prev) => (prev + 1) % VALUES.length)
+        setCurrent((prev) => (prev + 1) % values.length)
       }
     }, 4000)
   }, [paused])
@@ -82,18 +83,20 @@ const ValuesCarousel = () => {
 
   const prev = () => {
     setDirection(-1)
-    setCurrent((c) => (c === 0 ? VALUES.length - 1 : c - 1))
+    setCurrent((c) => (c === 0 ? values.length - 1 : c - 1))
     startTimer()
   }
 
   const next = () => {
     setDirection(1)
-    setCurrent((c) => (c + 1) % VALUES.length)
+    setCurrent((c) => (c + 1) % values.length)
     startTimer()
   }
 
-  const item = VALUES[current]
-  const Icon = item.icon
+  const item = values[current] || values[0]
+  // El backend manda el nombre del icono Lucide como string. Lo resolvemos
+  // dinamicamente del paquete y si no existe (typo de Diana) caemos a Shield.
+  const Icon = (typeof item.icon === 'string' ? LucideIcons[item.icon] : item.icon) || Shield
 
   const variants = {
     enter: (dir) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -146,7 +149,7 @@ const ValuesCarousel = () => {
                     </IconWrapper>
                     <ValueTitle>{item.title}</ValueTitle>
                     <ValueDesc>{item.description}</ValueDesc>
-                    <Counter>{current + 1} / {VALUES.length}</Counter>
+                    <Counter>{current + 1} / {values.length}</Counter>
                   </CardContent>
                 </ValueCard>
               </CardMotion>
@@ -159,7 +162,7 @@ const ValuesCarousel = () => {
         </CarouselArea>
 
         <DotsRow>
-          {VALUES.map((_, i) => (
+          {values.map((_, i) => (
             <Dot key={i} $active={i === current} onClick={() => goTo(i)} />
           ))}
         </DotsRow>

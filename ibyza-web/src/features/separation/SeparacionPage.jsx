@@ -13,7 +13,7 @@ import { formatPriceUSD, formatArea } from '@/shared/utils/formatters'
 import { buildProjectDetailRoute } from '@/shared/constants/routes'
 import useUIStore from '@/shared/stores/useUIStore'
 import useDepartamentosDisponibles from './hooks/useDepartamentosDisponibles'
-import heroBg from '@/assets/images/hero-about-pexels-1920w.webp'
+import heroBg from '@/assets/images/hero-urban-bw-1920w.webp'
 
 /**
  * SeparacionPage — Camino directo para separar un departamento.

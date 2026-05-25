@@ -17,12 +17,16 @@ const AboutPage = () => {
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const res = await api.get('/api/contenido/', { params: { seccion: 'nosotros' } });
+        // Trae todo lo de la pagina Nosotros (hero + mision_vision).
+        // Convencion: la clave del entry es el nombre exacto del campo que
+        // espera el componente: titulo, subtitulo, imagen_hero, stat_*,
+        // mision, vision, propuesta_valor, etc. El campo puede ser texto
+        // (valor) o imagen (imagen) — la clave determina como se usa.
+        const res = await api.get('/api/contenido/', { params: { pagina: 'nosotros' } });
         const items = res.data?.results || res.data || [];
         const obj = {};
         items.forEach((item) => {
-          obj[item.clave] = item.valor;
-          if (item.imagen) obj[`imagen_${item.clave}`] = item.imagen;
+          obj[item.clave] = item.imagen || item.valor;
         });
         setContent(obj);
       } catch {

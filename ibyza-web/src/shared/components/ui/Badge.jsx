@@ -49,9 +49,9 @@ const statusStyles = {
     border-color: rgba(99, 102, 241, 0.35);
   `,
   en_venta: css`
-    background-color: rgba(214, 179, 112, 0.15);
-    color: #FFE499;
-    border-color: rgba(214, 179, 112, 0.4);
+    background-color: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+    border-color: rgba(34, 197, 94, 0.35);
   `,
   entregado: css`
     background-color: rgba(255, 255, 255, 0.06);
@@ -70,7 +70,7 @@ const dotColors = {
   separado: '#fbbf24',
   vendido: '#f87171',
   en_construccion: '#a5b4fc',
-  en_venta: '#FFE499',
+  en_venta: '#4ade80',
   entregado: 'rgba(255,255,255,0.6)',
   preventa: '#7dd3fc',
 };

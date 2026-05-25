@@ -167,12 +167,12 @@ const Track = styled.div`
   flex-wrap: nowrap;
   gap: 20px;
   width: max-content;
-  animation: ${marqueeAnimation} 60s linear infinite;
+  animation: ${marqueeAnimation} 30s linear infinite;
   will-change: transform;
 
   // Mobile: animacion mas rapida (cards mas chicas, queremos que se note).
   ${({ theme }) => theme.media.mobile} {
-    animation-duration: 40s;
+    animation-duration: 20s;
   }
 
   // Si el usuario tiene reduce-motion, dejamos el track quieto pero

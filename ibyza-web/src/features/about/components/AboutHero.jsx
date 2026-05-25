@@ -8,7 +8,7 @@ import { staggerContainer, fadeInUp } from '@/shared/utils/animations'
  * Stats integrados dentro del hero (sin seccion vacia debajo).
  * Imagen de fondo dinamica desde CMS.
  */
-import heroFallback from '@/assets/images/hero-about-pexels.webp'
+import heroFallback from '@/assets/images/hero-urban-bw-1920w.webp'
 const HERO_FALLBACK = heroFallback
 
 const AboutHero = ({ content }) => {

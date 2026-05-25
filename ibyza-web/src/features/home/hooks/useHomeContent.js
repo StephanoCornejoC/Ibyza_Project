@@ -3,8 +3,16 @@ import api from '@/shared/services/api';
 
 /**
  * Hook para cargar el contenido del CMS de la pagina de inicio.
- * Consulta GET /api/contenido/?seccion=hero|nosotros
- * y GET /api/proyectos/ para el carrusel de proyectos.
+ *
+ * Consulta GET /api/contenido/?pagina=inicio  -> trae TODOS los entries del Home
+ * (Hero + Quienes Somos). Splittea por seccion en heroContent/aboutContent para
+ * que los componentes existentes no cambien su API.
+ *
+ * Tambien GET /api/proyectos/ para el carrusel.
+ *
+ * Nota sobre la imagen: el backend devuelve `imagen` en cada entry. Si el item
+ * tiene una imagen (por ejemplo, el hero), se expone como `imagen_<clave>` para
+ * que el componente la pueda leer sin colisionar con el texto.
  */
 const useHomeContent = () => {
   const [heroContent, setHeroContent] = useState(null);
@@ -21,28 +29,32 @@ const useHomeContent = () => {
         setLoading(true);
         setError(null);
 
-        const [heroRes, nosotrosRes, projectsRes] = await Promise.allSettled([
-          api.get('/api/contenido/', { params: { seccion: 'hero' } }),
-          api.get('/api/contenido/', { params: { seccion: 'nosotros' } }),
+        const [contenidoRes, projectsRes] = await Promise.allSettled([
+          api.get('/api/contenido/', { params: { pagina: 'inicio' } }),
           api.get('/api/proyectos/'),
         ]);
 
         if (!isMounted) return;
 
-        // Procesar hero
-        if (heroRes.status === 'fulfilled') {
-          const items = heroRes.value.data?.results || heroRes.value.data || [];
-          const obj = {};
-          items.forEach((item) => { obj[item.clave] = item.valor; });
-          setHeroContent(obj);
-        }
-
-        // Procesar nosotros
-        if (nosotrosRes.status === 'fulfilled') {
-          const items = nosotrosRes.value.data?.results || nosotrosRes.value.data || [];
-          const obj = {};
-          items.forEach((item) => { obj[item.clave] = item.valor; });
-          setAboutContent(obj);
+        // Procesar contenido del Home: split por seccion.
+        // Convencion: la `clave` del entry es exactamente el nombre del
+        // campo que el componente del frontend espera leer:
+        //   - clave="titulo"        -> content.titulo
+        //   - clave="imagen_fondo"  -> content.imagen_fondo (URL de imagen)
+        //   - clave="imagen_hero"   -> content.imagen_hero  (URL de imagen)
+        // El entry usa `valor` (texto) O `imagen` (URL), no ambos.
+        if (contenidoRes.status === 'fulfilled') {
+          const items = contenidoRes.value.data?.results || contenidoRes.value.data || [];
+          const hero = {};
+          const about = {};
+          items.forEach((item) => {
+            const target = item.seccion === 'hero' ? hero : about;
+            // Si el entry tiene imagen subida, esa URL es el valor de la clave.
+            // Si no, usar el texto del `valor`.
+            target[item.clave] = item.imagen || item.valor;
+          });
+          setHeroContent(hero);
+          setAboutContent(about);
         }
 
         // Procesar proyectos — tomar todos los resultados

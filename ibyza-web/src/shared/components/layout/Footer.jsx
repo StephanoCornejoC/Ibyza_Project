@@ -39,9 +39,21 @@ export const Footer = () => {
         {/* Col 1: Marca */}
         <FooterBrand>
           <BrandLogo>IBYZA</BrandLogo>
-          <BrandTagline>
-            Tu mejor inversión al mejor precio y en la mejor ubicación.
-          </BrandTagline>
+          <MiniMap>
+            <iframe
+              title="Ubicación IBYZA"
+              src={`https://maps.google.com/maps?q=${encodeURIComponent(direccion)}&t=&z=16&ie=UTF8&iwloc=&output=embed`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+            />
+            <MiniMapOverlay
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Abrir ubicación en Google Maps"
+            />
+          </MiniMap>
           <SocialLinks>
             <SocialLink href={facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
               <FacebookIcon />
@@ -176,17 +188,45 @@ const BrandLogo = styled.div`
   }
 `;
 
-const BrandTagline = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  font-weight: 300;
-  line-height: 1.85;
-  color: ${({ theme }) => theme.colors.textSecondary};
+const MiniMap = styled.div`
+  position: relative;
+  width: 100%;
   max-width: 280px;
+  height: 150px;
+  margin-top: ${({ theme }) => theme.spacing.md};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
+  border-radius: ${({ theme }) => theme.radii.md};
+  overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.glass.border};
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: border-color ${({ theme }) => theme.transitions.fast},
+    box-shadow ${({ theme }) => theme.transitions.fast};
+
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    filter: grayscale(0.25) contrast(1.05);
+  }
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.borderGold};
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35),
+      0 0 12px rgba(214, 179, 112, 0.18);
+  }
 
   ${({ theme }) => theme.media.tablet} {
     max-width: 100%;
   }
+`;
+
+const MiniMapOverlay = styled.a`
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  text-decoration: none;
 `;
 
 const SocialLinks = styled.div`
