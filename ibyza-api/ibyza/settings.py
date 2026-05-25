@@ -387,6 +387,10 @@ UNFOLD = {
 # ─── Seguridad en producción ─────────────────────────────────────────────────
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
+    # Eximir /healthz/ del redirect HTTPS. Railway's internal healthchecker pega
+    # por HTTP sin X-Forwarded-Proto, y el 301 le da fail. /healthz/ no expone
+    # datos sensibles (solo {"status": "ok"}) asi que es seguro servirlo por HTTP.
+    SECURE_REDIRECT_EXEMPT = [r'^healthz/$']
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
