@@ -7,6 +7,10 @@
 *.env
 !.env.example
 
+# ─── Dumps de data (NUNCA subir — contiene users con hashes y data del cliente) ─
+ibyza-api/data_export.json
+**/data_export.json
+
 # ─── Backend (Django / Python) ───────────────────────────────────────────────
 __pycache__/
 *.py[cod]
