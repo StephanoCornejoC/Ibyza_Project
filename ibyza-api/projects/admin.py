@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from unfold.admin import ModelAdmin, TabularInline
+from unfold.admin import ModelAdmin, StackedInline, TabularInline
 from .models import Proyecto, Nivel, Departamento, AvanceDeObra, VideoProyecto, ImagenGaleria
 
 
@@ -29,6 +29,18 @@ class NivelInline(TabularInline):
     fields = ('numero', 'nombre', 'imagen_planta', 'orden')
     verbose_name = 'Piso'
     verbose_name_plural = 'Pisos del proyecto'
+
+
+class AvanceInline(StackedInline):
+    """Avances de obra del proyecto. StackedInline (no Tabular) porque el
+    campo `contenido` es TextField y queda apretado en formato tabla."""
+    model = AvanceDeObra
+    extra = 0
+    fields = ('titulo', 'fecha', 'publicado', 'contenido', 'imagen')
+    classes = ('collapse',)  # arranca colapsado para no sobrecargar la pagina del proyecto
+    verbose_name = 'Avance de obra'
+    verbose_name_plural = 'Avances de obra'
+    ordering = ('-fecha',)
 
 
 class DepartamentoInline(TabularInline):
@@ -70,7 +82,7 @@ class ProyectoAdmin(ModelAdmin):
     search_fields = ('nombre', 'ubicacion')
     list_editable = ('activo',)
     prepopulated_fields = {'slug': ('nombre',)}
-    inlines = [NivelInline, VideoInline, GaleriaInline]
+    inlines = [NivelInline, GaleriaInline, VideoInline, AvanceInline]
     save_on_top = True
 
     fieldsets = (
