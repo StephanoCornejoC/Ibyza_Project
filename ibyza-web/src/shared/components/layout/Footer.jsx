@@ -27,7 +27,7 @@ export const Footer = () => {
 
   const direccion = config?.direccion || 'Puente Bolívar 205, Umacollo, Arequipa';
   const telefono = config?.telefono || '+51 993 674 174';
-  const email = config?.email || 'ventas@ibyzacorp.com';
+  const email = config?.email || 'renata.delgado@ibyzacorp.com';
   const facebookUrl = config?.facebook_url || 'https://www.facebook.com/profile.php?id=61580984001744';
 
   return (

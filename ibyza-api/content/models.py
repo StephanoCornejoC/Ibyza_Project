@@ -82,7 +82,7 @@ class ConfiguracionSitio(models.Model):
         help_text='Incluye el código de país (+51 para Perú).',
     )
     email = models.EmailField(
-        'Correo de contacto', default='ventas@ibyzacorp.com',
+        'Correo de contacto', default='renata.delgado@ibyzacorp.com',
         help_text='Correo público que se muestra a los clientes.',
     )
     horario = models.CharField(

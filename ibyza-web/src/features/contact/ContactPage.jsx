@@ -40,7 +40,7 @@ const ContactPage = () => {
   const contactInfo = [
     { icon: MapPin, label: 'Dirección', value: config?.direccion || 'Puente Bolívar 205, Umacollo, Arequipa' },
     { icon: Phone, label: 'Teléfono', value: config?.telefono || '+51 993 674 174' },
-    { icon: Mail, label: 'Correo', value: config?.email || 'ventas@ibyzacorp.com' },
+    { icon: Mail, label: 'Correo', value: config?.email || 'renata.delgado@ibyzacorp.com' },
     { icon: Clock, label: 'Horario', value: config?.horario || 'Lun-Vie: 9:00 AM - 6:00 PM | Sab: 9:00 AM - 1:00 PM' },
   ];
 

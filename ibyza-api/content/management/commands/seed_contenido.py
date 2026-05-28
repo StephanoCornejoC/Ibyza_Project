@@ -122,7 +122,7 @@ CONTENIDOS = [
     {
         'seccion': 'contacto',
         'clave': 'email',
-        'valor': 'ventas@ibyzacorp.com',
+        'valor': 'renata.delgado@ibyzacorp.com',
     },
     {
         'seccion': 'contacto',

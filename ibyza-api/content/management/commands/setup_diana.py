@@ -38,7 +38,7 @@ from django.core.management.base import BaseCommand
 APPS_PERMITIDAS = ['projects', 'payments', 'contact', 'content']
 
 DEFAULT_USERNAME = 'admin.ibyzacorp'
-DEFAULT_EMAIL = 'admin@ibyzacorp.com'
+DEFAULT_EMAIL = 'renata.delgado@ibyzacorp.com'
 DEFAULT_GROUP_NAME = 'Administracion IBYZA'
 
 
