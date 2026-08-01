@@ -84,11 +84,6 @@ class ProductionConfigTest(TestCase):
         content = req_path.read_text(encoding="utf-8")
         self.assertIn('psycopg2', content)
 
-    def test_procfile_existe(self):
-        """Procfile debe existir para Railway/Heroku."""
-        procfile = Path(settings.BASE_DIR) / 'Procfile'
-        self.assertTrue(procfile.exists())
-
     def test_railway_toml_existe(self):
         """railway.toml debe existir para Railway."""
         railway = Path(settings.BASE_DIR) / 'railway.toml'

@@ -19,6 +19,10 @@ class ContenidoWebAPITest(BaseTestData, TestCase):
     def setUp(self):
         self.client = APIClient()
         self.url = '/api/contenido/'
+        # Aislamiento: la migracion de datos 0013 siembra entries base en la BD
+        # de test. Estos tests verifican el filtrado con conteos absolutos, asi
+        # que partimos de una tabla vacia para no depender del seed.
+        ContenidoWeb.objects.all().delete()
 
     # ── Listado general ──────────────────────────────────────────────────
 
