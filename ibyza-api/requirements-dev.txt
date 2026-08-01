@@ -7,9 +7,13 @@ django-cors-headers==4.4.0
 Pillow>=11.0.0
 python-dotenv==1.0.1
 dj-database-url==2.3.0
-gunicorn==22.0.0
+gunicorn>=23.0.0
 whitenoise==6.7.0
 django-filter==24.3
 django-unfold==0.42.0
 culqipy==0.2.4
-requests>=2.31.0
+requests>=2.32.2
+resend>=2.0.0
+# Storage R2 (S3-compatible): el codigo lo importa; necesario para correr la suite completa
+django-storages[s3]>=1.14.4
+boto3>=1.35.0
