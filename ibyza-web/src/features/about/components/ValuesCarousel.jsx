@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, createElement } from 'react'
 import styled from 'styled-components'
 import { motion, AnimatePresence } from 'framer-motion'
-import * as LucideIcons from 'lucide-react'
-import { Shield, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import api from '@/shared/services/api'
+import { resolveValueIcon, DEFAULT_VALUE_ICON } from '@/shared/constants/valueIcons'
 
 import valCompromiso from '@/assets/images/values-compromiso.webp'
 import valIntegridad from '@/assets/images/values-integridad.webp'
@@ -18,8 +18,8 @@ import valCalidad from '@/assets/images/values-calidad.webp'
  * Si el fetch falla o tarda, usa los 6 valores fallback hardcoded para no
  * dejar la pagina vacia.
  *
- * El icono se mapea por nombre desde lucide-react. Si Diana pone un nombre
- * que no existe, cae al icono `Shield` por defecto.
+ * El icono se mapea por nombre contra el catalogo curado de valueIcons.js.
+ * Si el CMS manda un nombre fuera de esa lista, cae al icono por defecto.
  */
 const FALLBACK_VALUES = [
   { id: 'f-1', title: 'Compromiso',     description: 'Nos comprometemos con la satisfacción total de nuestros clientes y el desarrollo de la comunidad.',  image: valCompromiso,     icon: 'Shield' },
@@ -50,7 +50,7 @@ const ValuesCarousel = () => {
             title: b.titulo,
             description: b.descripcion,
             image: b.imagen || null,
-            icon: b.icono || 'Shield',
+            icon: b.icono || DEFAULT_VALUE_ICON,
           })))
         }
       })
@@ -94,9 +94,17 @@ const ValuesCarousel = () => {
   }
 
   const item = values[current] || values[0]
-  // El backend manda el nombre del icono Lucide como string. Lo resolvemos
-  // dinamicamente del paquete y si no existe (typo de Diana) caemos a Shield.
-  const Icon = (typeof item.icon === 'string' ? LucideIcons[item.icon] : item.icon) || Shield
+  // El backend manda el nombre del icono Lucide como string. Se resuelve contra
+  // el catalogo curado de @/shared/constants/valueIcons; si el nombre no esta en
+  // la lista, resolveValueIcon devuelve el icono por defecto.
+  // Se usa createElement en vez de <Icon /> a proposito: resolveValueIcon no crea
+  // un componente nuevo, solo elige una referencia estable del catalogo. Con la
+  // forma <Icon /> el analizador de react-hooks lo interpreta como creacion de
+  // componente en render (falso positivo) y marca static-components.
+  const iconElement = useMemo(
+    () => createElement(resolveValueIcon(item.icon), { size: 32 }),
+    [item.icon],
+  )
 
   const variants = {
     enter: (dir) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
@@ -145,7 +153,7 @@ const ValuesCarousel = () => {
                   <CardOverlay />
                   <CardContent>
                     <IconWrapper>
-                      <Icon size={32} />
+                      {iconElement}
                     </IconWrapper>
                     <ValueTitle>{item.title}</ValueTitle>
                     <ValueDesc>{item.description}</ValueDesc>

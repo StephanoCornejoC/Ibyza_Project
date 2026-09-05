@@ -205,6 +205,47 @@ class ConfiguracionSitio(models.Model):
         return 'Configuración del sitio'
 
 
+# Catálogo de iconos disponibles para el carrusel de valores.
+#
+# DEBE MANTENERSE SINCRONIZADO con VALUE_ICONS en
+# ibyza-web/src/shared/constants/valueIcons.js.
+#
+# El front importa estos iconos por nombre desde lucide-react. Solo los que
+# están en esa lista quedan compilados en el bundle, así que un nombre fuera
+# del catálogo se vería como el icono por defecto. Ofrecerlos acá como choices
+# evita que se pueda guardar un nombre que el sitio no puede renderizar.
+VALUE_ICON_CHOICES = [
+    ('Shield', 'Escudo'),
+    ('ShieldCheck', 'Escudo con check'),
+    ('BadgeCheck', 'Insignia verificada'),
+    ('Lock', 'Candado'),
+    ('Star', 'Estrella'),
+    ('Sparkles', 'Destellos'),
+    ('Award', 'Medalla'),
+    ('Trophy', 'Trofeo'),
+    ('Gem', 'Gema'),
+    ('Users', 'Personas'),
+    ('Heart', 'Corazón'),
+    ('HandHeart', 'Mano con corazón'),
+    ('Handshake', 'Apretón de manos'),
+    ('Zap', 'Rayo'),
+    ('Lightbulb', 'Bombilla / idea'),
+    ('TrendingUp', 'Crecimiento'),
+    ('Target', 'Objetivo'),
+    ('Compass', 'Brújula'),
+    ('Building2', 'Edificio'),
+    ('Home', 'Casa'),
+    ('Key', 'Llave'),
+    ('MapPin', 'Ubicación'),
+    ('Hammer', 'Martillo'),
+    ('Ruler', 'Regla'),
+    ('Leaf', 'Hoja / sostenibilidad'),
+    ('Recycle', 'Reciclaje'),
+    ('CheckCircle2', 'Check en círculo'),
+    ('Clock', 'Reloj'),
+]
+
+
 class Beneficio(models.Model):
     """Valores / beneficios de IBYZA. Aparecen en la sección "Lo que nos define"
     de la página Nosotros (carrusel con auto-play). Editables 100% desde admin:
@@ -222,8 +263,8 @@ class Beneficio(models.Model):
         help_text='Imagen que aparece de fondo en la card del valor. Recomendado: 800×600 px, máximo 400 KB. Si no subís imagen, la card queda con fondo oscuro plano.',
     )
     icono = models.CharField(
-        'Icono', max_length=50, default='ShieldCheck',
-        help_text='Nombre exacto de un icono de Lucide (https://lucide.dev/icons). Ejemplos: Shield, Star, Zap, Heart, Users, Award.',
+        'Icono', max_length=50, default='Shield', choices=VALUE_ICON_CHOICES,
+        help_text='Elige el icono de la lista. Solo aparecen los iconos que el sitio tiene compilados; si necesitas uno nuevo, pídelo a COREM.',
     )
     orden = models.PositiveIntegerField(
         'Orden', default=0,
